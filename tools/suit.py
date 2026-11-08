@@ -143,7 +143,7 @@ def pose(anim, t):
     if anim == 'idle':
         p['bob'] = 1 if t >= 0.5 else 0
     elif anim == 'run':
-        p.update(bob=round(abs(s) * 1.5), lean=1, th_f=0.75 * s, th_b=-0.75 * s,
+        p.update(bob=1 if abs(s) > 0.7 else 0, lean=1, th_f=0.75 * s, th_b=-0.75 * s,
                  kn_f=max(0.0, -s) * 1.4 + 0.15, kn_b=max(0.0, s) * 1.4 + 0.15,
                  arm_b=0.7 * s, el_b=-0.9)
         p['foot_f'] = 'toe' if s < -0.4 else 'flat'
@@ -153,7 +153,7 @@ def pose(anim, t):
     elif anim == 'fall':
         p.update(bob=-1, th_f=0.45, kn_f=0.5, th_b=-0.2, kn_b=0.4, foot_b='toe', arm_b=-1.4 + 0.2 * s, el_b=-0.3)
     elif anim == 'dash':
-        p.update(bob=3, lean=3, th_f=1.2, kn_f=1.5, th_b=-1.05, kn_b=0.25, foot_b='toe', arm_b=-0.6, el_b=-0.4)
+        p.update(bob=3, lean=2, th_f=1.2, kn_f=1.5, th_b=-1.05, kn_b=0.25, foot_b='toe', arm_b=-0.6, el_b=-0.4)
     elif anim == 'wall':
         p.update(lean=-1, th_f=0.8, kn_f=1.4, th_b=0.1, kn_b=0.9, foot_b='toe', arm_b=-2.3, el_b=0.3)
     elif anim == 'hurt':
@@ -168,11 +168,50 @@ def leg_points(hip, thigh, knee_bend):
     return knee, ankle
 
 
+BACK_ARM = [({13: (7, "ddd"), 14: (7, "ddd"), 15: (7, "ddd"), 16: (7, "bbd")}, (12, 24)),
+            ({17: (7, "bbb"), 18: (7, "bbb")}, (12, 24)),
+            ({19: (6, "daad"), 20: (6, "daad"), 21: (6, "daad"), 22: (6, "dddd")}, (12, 24)),
+            ({23: (7, "bbb"), 24: (7, "bbb")}, (12, 24))]
+
+
+def upper_block():
+    """Tronco inteiro (como no desenho aprovado) numa peça rígida só, com o
+    pivô no centro do quadril. Contornos internos já incluídos."""
+    f = Frame(64, 64)
+    at = (32, 40)
+    for piece in BACK_ARM:
+        f.part(place(piece, at))
+    f.part(place(BACK_PAD, (at[0] - 4, at[1] - 11)))
+    f.part(place(HIPS, at))
+    f.part(place(BELLY, at))
+    f.part(place(CHEST, at))
+    f.part(place(NECK, (at[0], at[1] - 14)))
+    f.part(place(FIN, (at[0], at[1] - 14)))
+    f.part(place(HELMET, (at[0], at[1] - 14)))
+    return {(x - at[0], y - at[1]): ch for (x, y), ch in f.g.items()}
+
+
+_UPPER = None
+
+
+def leg_layer(joint, knee, ankle, foot, dark):
+    """Perna inteira numa peça só: coxa, canela, joelheira e pé, sem
+    contornos internos (o joelho é marcado pela joelheira)."""
+    layer = {}
+    layer.update(segment((joint[0], joint[1] - 1), knee, 4.0, darker=dark))
+    layer.update(segment(knee, ankle, 3.6, darker=dark))
+    layer.update(place(KNEE, knee, darker=dark))
+    layer.update(place(foot, (ankle[0], ankle[1] - 0.5), darker=dark))
+    return layer
+
+
 def draw(anim, t, w=64, h=64, origin=(32, 60)):
     """Desenha um quadro do corpo (sem o braço-canhão). Retorna (Frame, ombro da frente)."""
+    global _UPPER
+    if _UPPER is None:
+        _UPPER = upper_block()
     p = pose(anim, t)
     f = Frame(w, h)
-    # Quadril: no parado, a sola fica na linha do chão (origem).
     hip = (origin[0], origin[1] - 20 - p['bob'])
     legs = {}
     for side, th, kn in (('b', p['th_b'], p['kn_b']), ('f', p['th_f'], p['kn_f'])):
@@ -183,36 +222,13 @@ def draw(anim, t, w=64, h=64, origin=(32, 60)):
         shift = (origin[1] - 5) - lowest
         legs = {k: tuple((x, y + shift) for x, y in v) for k, v in legs.items()}
         hip = (hip[0], hip[1] + shift)
-    top = (hip[0] + p['lean'], hip[1])
-    shoulder_b = (top[0] - 4, top[1] - 11)
-    shoulder_f = (top[0] + 5, top[1] - 10)
-    neck = (top[0], top[1] - 14)
-    # Braço de trás (na sombra): braço, cotovelo, antebraço, mão; ombreira.
-    elbow_b = (shoulder_b[0] + math.sin(p['arm_b']) * 4.5, shoulder_b[1] + math.cos(p['arm_b']) * 4.5)
-    a2 = p['arm_b'] + p['el_b']
-    hand_b = (elbow_b[0] + math.sin(a2) * 5.0, elbow_b[1] + math.cos(a2) * 5.0)
-    f.part(segment(shoulder_b, elbow_b, 2.6, darker=True, suit=True))
-    f.part(segment(elbow_b, hand_b, 3.6, darker=True))
-    f.part({(round(hand_b[0]) + dx, round(hand_b[1]) + dy): 'b' for dx in (-1, 0) for dy in (0, 1)})
-    f.part(place(BACK_PAD, shoulder_b, darker=True))
-    # Perna de trás, quadril, perna da frente.
-    for side in ('b', 'f'):
-        joint, knee, ankle = legs[side]
-        dark = side == 'b'
-        if side == 'f':
-            f.part(place(HIPS, hip))
-        f.part(segment(joint, knee, 4.0, darker=dark))
-        f.part(segment(knee, ankle, 3.6, darker=dark))
-        f.part(place(KNEE, knee, darker=dark))
-        foot = FOOT_TOE if p['foot_' + side] == 'toe' else FOOT_FLAT
-        f.part(place(foot, ankle, darker=dark))
-    # Tronco, pescoço e capacete.
-    f.part(place(BELLY, (top[0] - (p['lean'] > 1), top[1])))
-    f.part(place(CHEST, top))
-    f.part(place(NECK, neck))
-    f.part(place(FIN, neck))
-    f.part(place(HELMET, neck))
-    return f, (round(shoulder_f[0]), round(shoulder_f[1]))
+    top = (round(hip[0] + p['lean'] * 0.5), round(hip[1]))
+    joint, knee, ankle = legs['b']
+    f.part(leg_layer(joint, knee, ankle, FOOT_TOE if p['foot_b'] == 'toe' else FOOT_FLAT, True))
+    f.part({(x + top[0], y + top[1]): ch for (x, y), ch in _UPPER.items()})
+    joint, knee, ankle = legs['f']
+    f.part(leg_layer(joint, knee, ankle, FOOT_TOE if p['foot_f'] == 'toe' else FOOT_FLAT, False))
+    return f, (top[0] + 5, top[1] - 10)
 
 
 def cannon_layers(kind):

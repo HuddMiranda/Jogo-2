@@ -49,6 +49,10 @@ Correndo, o canhão vai apontado para a frente. **Pular correndo** vira **cambal
 | Louva-a-deus Glacial | Geleira Fóssil | Lâmina Glacial | Pó Prismático |
 | Mariposa de Cristal | Caverna Prismática | Pó Prismático | Ferrão de Plasma |
 
+## Arte HD (em preparação)
+
+A direção de arte definitiva é **2D pintada em alta resolução** (no estilo de *Afterimage*). O jogo já está pronto para recebê-la: personagens (`art/hd/<nome>/`), blocos do mapa (`art/hd/tiles/<bioma>.png`) e fundos em camadas (`art/hd/backgrounds/<bioma>/`) **substituem sozinhos** a pixel art provisória quando os arquivos existem. Tudo o que o artista precisa (estilo, tamanhos, animações, nomes de arquivo, prioridades) está em **[docs/ARTE_HD.md](docs/ARTE_HD.md)**. Ao exportar o jogo, inclua `*.cfg` no filtro de arquivos não-recurso (para os `info.cfg`).
+
 ## Como o projeto é feito
 
 ```

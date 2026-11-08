@@ -8,14 +8,23 @@ const T := 16
 
 var level  # a fase (scenes/level/level.gd)
 var _atlas: Texture2D
+## Tamanho de um bloco no atlas (16 na pixel art; maior na arte HD).
+var _atlas_tile := 16.0
 var _time := 0.0
 
 
 func _process(delta: float) -> void:
 	_time += delta
 	if level and _atlas == null:
+		# Arte HD (art/hd/tiles/<bioma>.png, blocos de 64 px) tem preferência.
+		var hd := "res://art/hd/tiles/%s.png" % level.biome
 		var path := "res://art/tiles/%s.png" % level.biome
-		_atlas = load(path) if ResourceLoader.exists(path) else null
+		if ResourceLoader.exists(hd):
+			_atlas = load(hd)
+			_atlas_tile = _atlas.get_width() / 8.0
+			texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		else:
+			_atlas = load(path) if ResourceLoader.exists(path) else null
 		queue_redraw()
 
 
@@ -59,7 +68,7 @@ func _draw_block(x: int, y: int, rect: Rect2) -> void:
 
 func _tile(rect: Rect2, col: int, row: int) -> void:
 	if _atlas:
-		draw_texture_rect_region(_atlas, rect, Rect2(col * T, row * T, T, T))
+		draw_texture_rect_region(_atlas, rect, Rect2(col * _atlas_tile, row * _atlas_tile, _atlas_tile, _atlas_tile))
 	else:
 		draw_rect(rect, Color(0.3, 0.35, 0.4))
 

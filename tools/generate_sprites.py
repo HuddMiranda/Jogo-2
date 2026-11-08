@@ -23,8 +23,9 @@ from PIL import Image  # noqa: E402
 
 # --- Herói: caçador de armadura simbionte ---------------------------------------
 
-HERO = dict(armor=rgb('1f7a86'), armor2=rgb('d9cfb0'), suit=rgb('22202e'), glow=rgb('7affe0'),
-            visor=rgb('5ae8ff'), gem=rgb('ff5a8a'), boot=rgb('1a6670'))
+HERO = dict(armor=rgb('2a8fa0'), armor2=rgb('e6dcc0'), suit=rgb('26243a'), glow=rgb('7affe0'),
+            visor=rgb('5ae8ff'), gem=rgb('ff4a7a'), boot=rgb('1a6670'), skin=rgb('f0c8a8'),
+            eye=rgb('2a3a8a'), hair=rgb('d04a7a'))
 
 
 def hero_pose(anim, t):
@@ -54,74 +55,94 @@ def hero_pose(anim, t):
 
 
 def hero(cv, anim, t):
+    """VEX-9: proporções de herói de ação (cabeça e capacete grandes, ombreiras,
+    antebraços e botas grossas e arredondadas; cintura e coxas finas)."""
     p = hero_pose(anim, t)
     col = HERO
-    hip = (0.0, -19.0 - p['bob'] + 3.0 * (1 - math.cos(min(p['knee_f'], p['knee_b']) * 0.5)))
+    hip = (0.0, -19.5 - p['bob'] + 3.5 * (1 - math.cos(min(p['knee_f'], p['knee_b']) * 0.5)))
     lean = p['lean']
-    neck = add(hip, (math.sin(lean) * 12, -math.cos(lean) * 12))
-    sh_f = add(neck, (2.5, 2.0))
-    sh_b = add(neck, (-2.5, 2.0))
-    head = add(neck, (math.sin(lean + p['head']) * 5.5, -math.cos(lean + p['head']) * 5.5))
+    neck = add(hip, (math.sin(lean) * 10.5, -math.cos(lean) * 10.5))
+    sh_f = add(neck, (3.0, 1.5))
+    sh_b = add(neck, (-3.0, 1.0))
+    head = add(neck, (math.sin(lean + p['head']) * 7.0 + 1.0, -math.cos(lean + p['head']) * 7.0))
+    sway = math.sin(t * math.tau) * 1.0
 
     def leg(a, k, back):
-        knee = add(hip, ang(a, 8))
-        foot = add(knee, ang(a - k, 8))
-        dim = -0.28 if back else 0.0
-        cv.limb(hip, knee, 5, shade(col['suit'], dim))
-        # Bota blindada grossa, com a ponta para a frente.
-        d = ang(a - k, 1)
-        top = add(knee, (d[0] * 1.5, d[1] * 1.5))
-        cv.poly([add(top, (-3.5, 0)), add(top, (3.5, 0)), add(foot, (4.5, 0)), add(foot, (6, 3)),
-                 add(foot, (-4, 3)), add(foot, (-4, -1))], shade(col['boot'], dim))
-        cv.limb(add(top, (-3, 1)), add(top, (3, 1)), 1.5, shade(col['armor2'], dim), outline=False)
-        cv.pixel(add(foot, (2, 0)), col['glow'] if not back else shade(col['glow'], -0.5))
+        dim = -0.3 if back else 0.0
+        knee = add(hip, ang(a, 8.5))
+        foot = add(knee, ang(a - k, 9.5))
+        cv.limb(hip, add(knee, ang(a - k, 1.0)), 4.5, shade(col['suit'], dim))
+        # Bota grande: cano grosso arredondado, faixa clara no topo e pé em "ovo".
+        top = add(knee, ang(a - k, 2.0))
+        cv.limb(top, add(foot, (0, -2)), 8.5, shade(col['armor'], dim))
+        cv.ellipse(add(foot, (2.0, -1.5)), 6.0, 3.6, shade(col['armor'], dim))
+        d = ang(a - k, 1.0)
+        side = (-d[1], d[0])
+        cv.limb(add(top, (side[0] * 3.8, side[1] * 3.8)), add(top, (-side[0] * 3.8, -side[1] * 3.8)), 2.4,
+                shade(col['armor2'], dim), outline=False)
+        cv.pixel(add(foot, (4, -2)), col['glow'] if not back else shade(col['glow'], -0.5))
 
     def back_arm():
-        el = add(sh_b, ang(p['arm_b'], 7))
+        dim = -0.3
+        el = add(sh_b, ang(p['arm_b'], 6))
         hand = add(el, ang(p['arm_b'] + p['elbow_b'], 6))
-        cv.limb(sh_b, el, 4, shade(col['suit'], -0.28))
-        cv.limb(el, hand, 5, shade(col['armor'], -0.28))
-        cv.ellipse(hand, 2.6, 2.6, shade(col['armor2'], -0.3))
+        cv.limb(sh_b, el, 3.5, shade(col['suit'], dim))
+        cv.limb(el, add(el, ang(p['arm_b'] + p['elbow_b'], 4.5)), 7.0, shade(col['armor'], dim))
+        cv.ellipse(hand, 3.0, 3.0, shade(col['armor2'], dim))
+        cv.ellipse(add(sh_b, (0, -0.5)), 4.8, 4.2, shade(col['armor'], dim))
 
+    # Rabo de cavalo saindo do capacete (atrás de tudo).
+    tail = add(head, (-6.5, 1.0))
+    prev = tail
+    for k in range(3):
+        nxt = add(prev, (-2.5 - k * 0.5, 2.5 + sway * (k + 1) * 0.4 - p['bob'] * 0.2))
+        cv.limb(prev, nxt, 3.6 - k * 0.8, col['hair'])
+        prev = nxt
     back_arm()
     leg(p['thigh_b'], p['knee_b'], True)
+    # Cintura fina e cinto com a gema.
+    cv.limb(hip, add(neck, (0, 3)), 5.5, col['suit'])
     leg(p['thigh_f'], p['knee_f'], False)
-    # Tronco: abdômen do traje e peitoral blindado com a gema-núcleo.
-    cv.poly([add(hip, (-4, 2)), add(hip, (4, 2)), add(neck, (4, 6)), add(neck, (-4, 6))], col['suit'])
-    cv.poly([add(neck, (-6, 0)), add(neck, (6.5, 0)), add(neck, (6, 6)), add(neck, (3, 9)),
-             add(neck, (-3, 9)), add(neck, (-6, 6))], col['armor'])
-    cv.limb(add(hip, (-4.5, 0)), add(hip, (4.5, 0)), 2.5, col['armor2'], outline=False)
-    cv.ellipse(add(neck, (1.5, 4)), 2, 2, col['gem'], glow=True)
-    cv.pixel(add(neck, (1, 3)), (255, 220, 235))
-    cv.ellipse(add(sh_b, (0, -0.5)), 3.5, 3, shade(col['armor2'], -0.25))
-    # Capacete: carapaça redonda, crista para trás e visor brilhante.
-    cv.poly([add(head, (-2, -5)), add(head, (-9, -7)), add(head, (-5, -3))], col['armor2'])
-    cv.ellipse(head, 6.5, 6.5, col['armor'])
-    cv.poly([add(head, (0, 0)), add(head, (6.8, -1.5)), add(head, (6.5, 2.5)), add(head, (1, 2))], col['visor'], glow=True)
-    cv.pixel(add(head, (4.5, -0.5)), (230, 255, 255))
-    cv.ellipse(add(head, (-3, 1)), 2, 2.5, col['armor2'])
-    cv.pixel(add(head, (-3, 1)), col['glow'])
+    cv.rounded(hip[0] - 5, hip[1] - 2.5, 10, 4, 2, col['armor2'])
+    cv.ellipse(add(hip, (1.5, -0.5)), 1.5, 1.5, col['gem'], glow=True)
+    # Peitoral arredondado com a gema-núcleo.
+    chest = add(neck, (1.0, 3.5))
+    cv.ellipse(chest, 6.5, 5.0, col['armor'])
+    cv.ellipse(add(chest, (2.0, 0.5)), 2.2, 2.2, col['gem'], glow=True)
+    cv.pixel(add(chest, (1.5, 0)), (255, 225, 238))
+    # Capacete grande: rosto à mostra, olho grande, disco na lateral e crista.
+    cv.poly([add(head, (-1, -7)), add(head, (-11, -11)), add(head, (-9, -8)), add(head, (-4, -4))], col['armor2'])
+    cv.ellipse(head, 8.2, 7.8, col['armor'])
+    cv.ellipse(add(head, (3.6, 2.0)), 4.3, 4.4, col['skin'], spec=False)
+    cv.limb(add(head, (0.5, -2.2)), add(head, (8.0, -2.2)), 3.2, col['armor'])       # aba do capacete
+    cv.pixel(add(head, (4.5, 0.6)), (250, 250, 255), 2)                               # olho
+    cv.pixel(add(head, (5.5, 1.6)), col['eye'])
+    cv.pixel(add(head, (5.5, 0.6)), col['eye'])
+    cv.ellipse(add(head, (-2.5, 1.0)), 3.2, 3.2, col['armor2'])                         # disco da orelha
+    cv.pixel(add(head, (-3.0, 0.5)), col['glow'], 2)
+    cv.ellipse(add(head, (5.0, -5.5)), 1.8, 1.8, col['gem'], glow=True)                # gema da testa
     return sh_f
 
 
 def hero_arm(cv, kind):
     """Braço da frente com origem no ombro: 0 solto, 1 canhão apontado para a frente."""
     col = HERO
-    cv.ellipse((0, -0.5), 3.8, 3.2, col['armor2'])
     if kind == 0:
-        el = ang(0.25, 7)
-        hand = add(el, ang(-0.2, 6))
-        cv.limb((0, 1), el, 4, col['suit'])
-        cv.limb(el, hand, 5, col['armor'])
-        cv.ellipse(hand, 2.8, 2.8, col['armor2'])
+        el = ang(0.2, 6)
+        hand = add(el, ang(-0.15, 6.5))
+        cv.limb((0, 1), el, 3.8, col['suit'])
+        cv.limb(el, add(el, ang(-0.15, 4.5)), 7.2, col['armor'])
+        cv.ellipse(hand, 3.2, 3.2, col['armor2'])
+        cv.ellipse((0, 0.8), 4.4, 4.0, col['armor'])
         return hand
-    el = (5.5, 2.5)
-    cv.limb((0, 1), el, 4, col['suit'])
-    cv.poly([add(el, (-1, -3.5)), add(el, (9, -3.5)), add(el, (10.5, -2)), add(el, (10.5, 2)), add(el, (9, 3.5)),
-             add(el, (-1, 3.5))], col['armor'])
-    cv.limb(add(el, (2, -3.5)), add(el, (2, 3.5)), 1.6, col['armor2'], outline=False)
-    cv.ellipse(add(el, (11, 0)), 2.5, 3.2, col['armor2'])
-    cv.ellipse(add(el, (11.5, 0)), 1.4, 1.8, col['glow'], glow=True)
+    el = (4.5, 2.5)
+    cv.limb((0, 1), el, 3.8, col['suit'])
+    # Canhão: cilindro grosso com anel claro e boca brilhante.
+    cv.limb(add(el, (0, 0)), add(el, (9.5, 0)), 8.6, col['armor'])
+    cv.limb(add(el, (3.5, -4.0)), add(el, (3.5, 4.0)), 2.4, col['armor2'], outline=False)
+    cv.ellipse(add(el, (11.0, 0)), 2.6, 4.0, col['armor2'])
+    cv.ellipse(add(el, (11.6, 0)), 1.5, 2.4, col['glow'], glow=True)
+    cv.ellipse((0, 0.8), 4.4, 4.0, col['armor'])
     return add(el, (13.5, 0))
 
 

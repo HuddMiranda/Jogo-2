@@ -68,6 +68,7 @@ tools/                   Geradores: sprites, tiles e mapas das fases
 ```
 
 - **Fases em texto:** cada fase é uma grade de caracteres (`#` bloco, `=` plataforma vazada, `^` espinhos, `c f t` inimigos, `L` Coração, `A` casulo, `D` porta do chefe...). `tools/build_levels.py` monta os mapas com retângulos e marcadores; dá para editar os `.gd` de `levels/` direto também.
+- **Estilo de arte:** volumes arredondados no estilo dos jogos de ação 16/32 bits: esferas e cilindros sombreados em faixas (luz de cima à esquerda, brilho especular, borda escura), cabeça/capacete grandes, ombreiras, antebraços e botas grossas, cintura e coxas finas. As primitivas ficam em `tools/pixel.py` (`ellipse` = esfera, `limb` = cilindro, `rounded` = placa).
 - **Arte:** `tools/generate_sprites.py` (personagens) e `tools/generate_tiles.py` (cenário) geram a pixel art (`pip install pillow numpy`).
 
 ## Próximos passos

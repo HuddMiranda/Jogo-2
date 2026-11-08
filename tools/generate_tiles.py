@@ -32,12 +32,12 @@ def c(*v): return np.array(v, dtype=np.float32)
 BIOMES = {
     # Ruínas bio-mecânicas (fase de abertura): placas de metal tomadas por veios vivos.
     'ruins': dict(base=c(70, 82, 92), light=c(104, 120, 132), dark=c(40, 48, 58), mortar=c(20, 26, 34),
-                  top=c(40, 150, 140), top_light=c(110, 255, 220), drip=c(30, 110, 104), pattern='brick',
+                  top=c(40, 150, 140), top_light=c(110, 255, 220), drip=c(30, 110, 104), pattern='panel',
                   ledge='slab', wood=c(84, 96, 108), wood_light=c(130, 146, 160), wood_dark=c(46, 54, 64),
                   wall=c(22, 28, 36), wall_light=c(32, 40, 50), wall_mortar=c(12, 16, 22)),
     # Colmeia de Plasma (fase da Vespa): cera âmbar e favos.
     'hive': dict(base=c(150, 96, 30), light=c(200, 140, 50), dark=c(90, 54, 18), mortar=c(48, 26, 8),
-                 top=c(230, 170, 60), top_light=c(255, 230, 140), drip=c(200, 130, 40), pattern='rock',
+                 top=c(230, 170, 60), top_light=c(255, 230, 140), drip=c(200, 130, 40), pattern='comb',
                  ledge='sinew', wood=c(170, 110, 40), wood_light=c(230, 170, 80), wood_dark=c(100, 60, 20),
                  accent=c(255, 200, 80), wall=c(44, 26, 12), wall_light=c(64, 40, 18), wall_mortar=c(24, 12, 4)),
 }
@@ -60,6 +60,44 @@ def material(b, w, h, rng, deep=False):
     n = noise(w, h, rng, 4)
     img[:] = base
     pattern = b['pattern']
+    if pattern == 'panel':
+        # Placas de metal de cantos arredondados, com chanfro e rebites.
+        ys, xs = np.mgrid[0:h, 0:w].astype(np.float32)
+        for y0 in range(0, h, 8):
+            offset = 8 if (y0 // 8) % 2 else 0
+            for x0 in range(-offset, w, 16):
+                tone = base + (light - base) * rng.uniform(0.0, 0.35)
+                for yy in range(y0, min(y0 + 8, h)):
+                    for xx in range(max(x0, 0), min(x0 + 16, w)):
+                        lx, ly = xx - x0, yy - y0
+                        corner = (lx in (0, 15)) and (ly in (0, 7))
+                        if lx == 0 or ly == 7 or corner:
+                            img[yy, xx] = mortar
+                        elif ly == 0 or lx == 1:
+                            img[yy, xx] = np.minimum(tone + 34, 255)
+                        elif ly == 6 or lx == 15:
+                            img[yy, xx] = tone * 0.7
+                        else:
+                            img[yy, xx] = tone * (1.0 - 0.06 * (ly / 7.0))
+                if rng.random() < 0.35 and x0 + 13 < w and x0 + 3 >= 0:
+                    rx = x0 + (3 if rng.random() < 0.5 else 12)
+                    if 0 <= rx < w - 1:
+                        img[y0 + 3, rx] = np.minimum(tone + 60, 255)
+                        img[y0 + 4, rx] = tone * 0.6
+        return img
+    if pattern == 'comb':
+        # Favos: células redondas e brilhantes de cera.
+        ys, xs = np.mgrid[0:h, 0:w].astype(np.float32)
+        img[:] = mortar
+        for cy, cx in ((4, 4), (4, 12), (12, 0), (12, 8), (12, 16), (4, 20), (12, -8)):
+            r2 = ((xs - cx) ** 2 + (ys - cy) ** 2) / 14.0
+            cell = r2 < 1.0
+            tone = (-(xs - cx) * 0.55 - (ys - cy) * 0.83) / 4.0 * 0.8 + (1 - r2) * 0.4
+            img[cell] = base
+            img[cell & (tone > 0.35)] = light
+            img[cell & (tone < -0.25)] = dark
+            img[cell & (tone > 0.75)] = np.minimum(light + 50, 255)
+        return img
     if pattern == 'brick':
         # Tijolos 16 × 8 desencontrados: alinhados à grade de 16, emendam bem.
         for y0 in range(0, h, 8):
@@ -222,7 +260,25 @@ def wall_texture(b, rng):
     n2 = noise(S, S, rng, 4)
     wall, wl, wm = b['wall'], b['wall_light'], b['wall_mortar']
     img[:] = wall[None, None, :] * (0.85 + 0.25 * n[:, :, None] + 0.1 * n2[:, :, None])
-    pattern = b['pattern']
+    pattern = {'panel': 'brick'}.get(b['pattern'], b['pattern'])
+    if pattern == 'comb':
+        # Favos grandes e escuros ao fundo (repete a cada 128 px).
+        ys, xs = np.mgrid[0:S, 0:S].astype(np.float32)
+        img[:] = wm
+        for row in range(7):
+            for col in range(6):
+                cx = col * 24 + (12 if row % 2 else 0)
+                cy = row * 21
+                for ox in (-128, 0, 128):
+                    for oy in (-128, 0, 128):
+                        dx, dy = xs - (cx + ox), ys - (cy + oy)
+                        r2 = (dx * dx + dy * dy) / 100.0
+                        cell = r2 < 1.0
+                        tone = (-dx * 0.55 - dy * 0.83) / 10.0 + (1 - r2) * 0.3
+                        img[cell] = wall
+                        img[cell & (tone > 0.35)] = wl
+                        img[cell & (tone < -0.3)] = wall * 0.7
+        return img
     if pattern == 'brick':
         for y0 in range(0, S, 16):
             offset = 16 if (y0 // 16) % 2 else 0

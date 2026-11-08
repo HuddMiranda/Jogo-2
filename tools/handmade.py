@@ -35,21 +35,22 @@ PALETTES = {
 }
 
 # VEX-9 parada (de lado, virada para a direita): proporções humanas (~6,5 cabeças),
-# capacete fechado com visor, ombreiras grandes, braço-canhão.
+# capacete anguloso (crista, aba pontuda, visor em fenda, máscara com saídas
+# de ar, aleta na nuca), ombreiras grandes, braço-canhão.
 # Cada segmento é uma peça com contorno próprio: coxa, joelheira, canela,
 # tornozelo e pé; braço, cotovelo, antebraço/canhão e mão.
 IDLE = """
-..........OAAaaO
-.........OAAaaaaO
-........OAAaaaaadO
-........OAaaaaVVvdO
-........OaaaaVWvvwO
-........OaGaavvvwwO
-........OagaaadwwdO
-.........OddaaOOOO
-......OOO.OddOAAAaOO
-.....OdddO.OOAAAAaaaO
-....OdaaadObOAAAaaaadO
+.........OOAGaO
+........OAAAGadO
+......OOAAagaaadO
+.....OdOAaagaaaadOO
+.....OdOaaaAddddddAO
+......OOaGgadVWVVvwO
+.......OaggaddvvwwdO
+.......OdaaaAAOOOOO
+......OOOdaaOOAAAaOO
+.....OdddOddOAAAAaaaO
+....OdaaadOOOAAAaaaadO
 ...OdaaaaOAOOAAaaaaadO
 ...OdaaadOAAOAaaaaaddO
 ....OdggdOAAOaaaaadddO

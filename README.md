@@ -51,9 +51,9 @@ Abra a pasta no **Godot 4.7** (Importar → `project.godot`) e aperte **F5**.
 
 (Os nomes internos no código continuam os antigos — `wasp`, `plasma_sting`... — para não quebrar o salvamento.)
 
-## Elyra em alta resolução (animação recortada)
+## Elyra em alta resolução (quadro a quadro)
 
-A protagonista já usa **arte em alta resolução com animação recortada (cutout)**: peças vetoriais com volume, gradientes e luz de recorte (`tools/hd_parts.py` → `art/hd/vex_parts/`): elfa sem armadura: cabelo loiro-claro comprido, orelhas pontudas, diadema com gema, túnica verde com cinto, mangas claras, braçadeiras e botas de couro, e uma espada élfica de lâmina em folha, presas num esqueleto em `scenes/player/hd_hero.gd`. Cada articulação vai **suavemente** de uma pose para a outra a cada quadro, então correr, parar, pular, pousar e virar fluem sem "pulos" entre quadros. Prévias em GIF fora do Godot: `python tools/hd_rig.py run saida.gif` (com `slash` no fim, golpeando). Um artista pode repintar as peças mantendo tamanho e pivô.
+A protagonista é **desenhada quadro a quadro**, como em *Afterimage*: `tools/hd_frames.py` desenha cada quadro **inteiro** (perna e braço são uma forma contínua que dobra em curva, sem juntas; contorno só por fora; cabelo que balança atrasado) a partir das poses de `tools/hd_rig.py`, e grava `art/hd/elyra/<animação>/NNNN.png` e `scripts/hero_frames.gd` (fps, mão e lâmina por quadro). O jogo toca os quadros com `scenes/player/frame_hero.gd`. Visual: elfa sem armadura, cabelo loiro-claro comprido, orelhas pontudas, diadema com gema, túnica verde com cinto, mangas claras, braçadeiras e botas de couro, espada élfica de lâmina em folha. Um artista pode repintar os PNG por cima mantendo o tamanho e a posição dos pés.
 
 ## Arte HD (em preparação)
 
@@ -67,7 +67,7 @@ scripts/game.gd          Estado global (autoload "Game"): Guardiões, poderes, f
 scripts/sfx.gd           Efeitos sonoros sintetizados (autoload "Sfx")
 scripts/effects.gd       Explosões, orbes e faíscas
 scripts/sprite_data.gd   Dados das animações (gerado)
-scenes/player/           Sentinela, sprite recortado (hd_hero.gd), golpe de espada (slash.gd) e projéteis
+scenes/player/           Sentinela, sprite quadro a quadro (frame_hero.gd), golpe de espada (slash.gd) e projéteis
 scenes/enemies/          Inimigos (base em enemy.gd) e projéteis
 scenes/bosses/           Guardiões (base em boss.gd) — Vespa de Âmbar
 scenes/level/            Fase montada pelo mapa em texto, tiles, fundo, itens

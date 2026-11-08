@@ -8,7 +8,7 @@ Guia para quem vai produzir a arte do jogo (artista, estúdio ou geração por I
 - **Mundo:** o reino élfico de **Sylvaria**: florestas antigas de árvores colossais, ruínas élficas de pedra clara com entalhes dourados tomadas por musgo e raízes, colmeias de âmbar, lagos de ninfeias, vaga-lumes e runas que brilham. Uma praga cinzenta corrompe partes do reino.
 - **Tom:** melancólico e misterioso, com pontos de cor fortes nas fontes de luz (magia, gemas, vaga-lumes).
 - **Protagonista — Elyra:** elfa espadachim, **sem armadura**, proporções humanas (cerca de 7 cabeças): pele clara, cabelo loiro-claro comprido, orelhas longas e pontudas, olhos verdes, diadema dourado com gema esmeralda; túnica verde-floresta com filete dourado e cinto de couro, mangas claras, braçadeiras e botas de couro, calça escura; **espada élfica** de lâmina em forma de folha, guarda dourada com gema.
-  - Referência: a versão por peças em `art/hd/vex_parts/` (proporções e paleta) e `art/hd/portrait.png`.
+  - Referência: os quadros gerados em `art/hd/elyra/` (proporções, paleta e poses) e `art/hd/portrait.png`.
 
 ## Formato técnico (vale para tudo)
 
@@ -61,7 +61,7 @@ run_shoot=Vector2(236, 126)
 | `wasp` (Vespa de Âmbar, chefe) | ~300 px | `idle` (8–12), `dash` (4), `shoot` (6), `hurt` (2) |
 | `items` | ~48 px cada | `health_small`, `health_big`, `energy_small`, `energy_big`, `heart`, `capsule` (4–6 cada) |
 
-Para a espada: `slash_down` e `slash_up` (4–6 cada, golpes alternados), `slash_charged` (6) e as mesmas no ar. Hoje o jogo anima a Elyra por peças (`tools/hd_parts.py`); quadros desenhados por um artista podem substituir isso depois.
+Para a espada: `slash_down` e `slash_up` (4–6 cada, golpes alternados), `slash_charged` (6) e as mesmas no ar. Hoje esses quadros são gerados por `tools/hd_frames.py` em `art/hd/elyra/`; um artista pode repintá-los por cima (mesmo tamanho e posição dos pés) para chegar à pintura final.
 
 ### Blocos do mapa
 

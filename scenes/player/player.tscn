@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scenes/player/player.gd" id="1_player"]
-[ext_resource type="Script" path="res://scenes/player/hd_hero.gd" id="2_sprite"]
+[ext_resource type="Script" path="res://scenes/player/frame_hero.gd" id="2_sprite"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(14, 42)

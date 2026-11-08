@@ -1,22 +1,9 @@
 #!/usr/bin/env python3
-"""Esqueleto e poses da Elyra HD (espelho em Python de scenes/player/hd_hero.gd),
-usado para gerar prévias (GIF) fora do Godot.
-
-    python tools/hd_rig.py run saida.gif
-
-As poses são ângulos por articulação (radianos; "para a frente" positivo) que
-o jogo interpola suavemente quadro a quadro. Mantenha este arquivo e
-hd_hero.gd iguais ao mexer nas poses.
+"""Esqueleto e poses da Elyra: ângulos por articulação (radianos; "para a
+frente" positivo) para cada animação e golpe de espada. tools/hd_frames.py usa
+isto para saber onde fica cada parte do corpo e desenha cada quadro inteiro.
 """
 import math
-import os
-import sys
-
-from PIL import Image
-
-ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
-R = 2  # pixels por unidade nos PNG
-PIVOTS = {}
 
 # Esqueleto (unidades; 4 unidades = 1 px do jogo). Origem nos pés.
 HIP = (0.0, -92.0)
@@ -146,61 +133,3 @@ def skeleton(p, grounded):
         sole = max(apply(m, pt)[1] for m in (fb, ff) for pt in ((-10, 24), (28, 24)))
         shift = -sole
     return parts, shift, sword
-
-
-def load_pivots():
-    if not PIVOTS:
-        for line in open(os.path.join(ROOT, 'scripts', 'hd_parts.gd')):
-            if '"pivot"' in line:
-                name = line.split('"')[1]
-                nums = line.split('Vector2(')[1].split(')')[0].split(',')
-                PIVOTS[name] = (float(nums[0]), float(nums[1]))
-
-
-def render(anim, t, attack=None, grounded=None, size=(300, 440), origin=(120, 420)):
-    """attack = (tipo do golpe, segundos desde o início) ou None."""
-    load_pivots()
-    if grounded is None:
-        grounded = anim in ('idle', 'run', 'dash', 'hurt')
-    p = pose(anim, t)
-    if attack:
-        p = attack_pose(p, attack[0], attack[1])
-    return render_pose(p, grounded, size, origin)
-
-
-def render_pose(p, grounded, size=(300, 440), origin=(120, 420)):
-    load_pivots()
-    parts, shift, _ = skeleton(p, grounded)
-    out = Image.new('RGBA', size, (0, 0, 0, 0))
-    for name, m, back in parts:
-        img = Image.open(os.path.join(ROOT, 'art', 'hd', 'vex_parts', name + '.png')).convert('RGBA')
-        if back:
-            px = img.load()
-            for y in range(img.height):
-                for x in range(img.width):
-                    r, g, b, a = px[x, y]
-                    px[x, y] = (int(r * 0.72), int(g * 0.7), int(b * 0.78), a)
-        rot = math.atan2(m[2], m[0])
-        pivot = PIVOTS[name]
-        rotated = img.rotate(-math.degrees(rot), resample=Image.BICUBIC, expand=True)
-        # Posição do pivô depois de girar com expand: recalcula pelo centro.
-        cx, cy = img.width / 2, img.height / 2
-        dx, dy = pivot[0] - cx, pivot[1] - cy
-        c, s = math.cos(rot), math.sin(rot)
-        new_pivot = (rotated.width / 2 + dx * c - dy * s, rotated.height / 2 + dx * s + dy * c)
-        wx, wy = m[4] * R + origin[0], (m[5] + shift) * R + origin[1]
-        out.alpha_composite(rotated, (int(round(wx - new_pivot[0])), int(round(wy - new_pivot[1]))))
-    return out
-
-
-if __name__ == '__main__':
-    anim = sys.argv[1] if len(sys.argv) > 1 else 'run'
-    path = sys.argv[2] if len(sys.argv) > 2 else 'preview.gif'
-    slash = len(sys.argv) > 3 and sys.argv[3] == 'slash'
-    frames = []
-    for i in range(36):
-        f = render(anim, i / 30.0, (i % 2, (i % 12) / 30.0) if slash else None)
-        bg = Image.new('RGBA', f.size, (24, 26, 36, 255))
-        bg.alpha_composite(f)
-        frames.append(bg.convert('P', palette=Image.ADAPTIVE))
-    frames[0].save(path, save_all=True, append_images=frames[1:], duration=33, loop=0, disposal=2)

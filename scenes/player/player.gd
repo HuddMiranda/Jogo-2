@@ -66,7 +66,7 @@ var _was_on_floor := true
 var _spinning := false
 var _dead := false
 
-## Sprite da sentinela: HDHero (arte HD recortada) ou HeroSprite (pixel art).
+## Sprite da sentinela: FrameHero (quadros desenhados) ou HeroSprite (pixel art).
 @onready var sprite = $Sprite
 
 
@@ -200,6 +200,8 @@ func _physics_process(delta: float) -> void:
 	elif _wall_lock <= 0.0:
 		var speed := dash_speed if (_dash_jump and not on_floor) else run_speed
 		velocity.x = direction * speed
+		if on_floor and sprite.has_method("is_attacking") and sprite.is_attacking():
+			velocity.x *= 0.15  # golpe no chão: a sentinela finca o pé
 		if _dash_jump and not on_floor and direction != 0.0:
 			_ghost_timer -= delta
 			if _ghost_timer <= 0.0:

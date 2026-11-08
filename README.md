@@ -68,7 +68,7 @@ tools/                   Geradores: sprites, tiles e mapas das fases
 ```
 
 - **Fases em texto:** cada fase é uma grade de caracteres (`#` bloco, `=` plataforma vazada, `^` espinhos, `c f t` inimigos, `L` Coração, `A` casulo, `D` porta do chefe...). `tools/build_levels.py` monta os mapas com retângulos e marcadores; dá para editar os `.gd` de `levels/` direto também.
-- **Estilo de arte:** volumes arredondados no estilo dos jogos de ação 16/32 bits: esferas e cilindros sombreados em faixas (luz de cima à esquerda, brilho especular, borda escura), cabeça/capacete grandes, ombreiras, antebraços e botas grossas, cintura e coxas finas. As primitivas ficam em `tools/pixel.py` (`ellipse` = esfera, `limb` = cilindro, `rounded` = placa).
+- **Estilo de arte:** pixel art de console. A VEX-9 (paleta **Marfim**, proporções humanas, capacete anguloso com visor em fenda, cada segmento do corpo com contorno próprio) é montada por peças desenhadas à mão em `tools/suit.py`: peças rígidas (capacete, ombreiras, tronco, quadril, joelheiras, pés, braço-canhão) copiadas pixel a pixel do desenho aprovado e membros traçados em cada pose com sombreado em faixas. `tools/handmade.py` guarda os desenhos em grade de letras (uma letra = um pixel) e as três paletas.
 - **Arte:** `tools/generate_sprites.py` (personagens) e `tools/generate_tiles.py` (cenário) geram a pixel art (`pip install pillow numpy`).
 
 ## Próximos passos

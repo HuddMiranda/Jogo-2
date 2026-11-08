@@ -291,7 +291,37 @@ SHEETS = {
 }
 
 
+def render_hero(spec):
+    """VEX-9: pixel art por peças (tools/suit.py), paleta Marfim."""
+    import suit
+    fw, fh = spec['frame']
+    origin = spec['origin']
+    anims = list(spec['anims'].items())
+    cols = max(n for n, _ in spec['anims'].values())
+    sheet = Image.new('RGBA', (fw * max(cols, 2), fh * (len(anims) + 1)))
+    meta = dict(frame=[fw, fh], origin=list(origin), anims={}, shoulders={})
+    for row, (anim, (frames, fps)) in enumerate(anims):
+        meta['anims'][anim] = dict(row=row, frames=frames, fps=fps)
+        shoulders = []
+        for k in range(frames):
+            frame, shoulder = suit.draw(anim, k / frames, fw, fh, origin)
+            shoulders.append([shoulder[0] - origin[0], shoulder[1] - origin[1]])
+            sheet.paste(frame.image(), (k * fw, row * fh))
+        meta['shoulders'][anim] = shoulders
+    row = len(anims)
+    meta['arm_row'] = row
+    meta['arm_origin'] = [32, 32]
+    for kind in (0, 1):
+        frame, muzzle = suit.cannon_layers(kind)
+        meta['muzzle' if kind == 1 else 'muzzle_down'] = [muzzle[0] - 32, muzzle[1] - 32]
+        sheet.paste(frame.image(), (kind * fw, row * fh))
+    sheet.save(os.path.join(OUT, 'hero.png'))
+    return meta
+
+
 def render(name, spec):
+    if name == 'hero':
+        return render_hero(spec)
     fw, fh = spec['frame']
     anims = list(spec['anims'].items())
     cols = max(n for n, _ in spec['anims'].values())

@@ -1,8 +1,9 @@
 @tool
 class_name HeroSprite
 extends SheetSprite
-## Sprite da caçadora: corpo + braço da frente desenhado por cima, solto ou
-## virado canhão (ao atirar), com o brilho da carga na boca do canhão.
+## Sprite da caçadora: corpo + braço-canhão (com a ombreira da frente)
+## desenhado por cima, abaixado ou apontado (ao atirar), com o brilho da carga
+## na boca do canhão.
 
 ## Mostra o canhão apontado (logo depois de atirar).
 var cannon := false
@@ -37,7 +38,8 @@ func _draw() -> void:
 		draw_texture_rect_region(_texture, Rect2(shoulder() - arm_origin, size), src, Color(1, 1, 1, flash * 0.8))
 	if charge_level > 0:
 		# Energia acumulando na boca do canhão.
-		var tip := muzzle() if cannon else shoulder() + Vector2(4, 10)
+		var down: Array = _data.get("muzzle_down", [4, 10])
+		var tip := muzzle() if cannon else shoulder() + Vector2(down[0], down[1])
 		var pulse := 0.5 + 0.5 * sin(_time * 30.0)
 		var radius := (3.0 if charge_level == 1 else 6.0) + pulse * 2.0
 		var color := weapon_color if charge_level == 1 else weapon_color.lerp(Color.WHITE, pulse * 0.6)

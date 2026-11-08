@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Esqueleto e poses da VEX-9 HD (espelho em Python de scenes/player/hd_hero.gd),
+"""Esqueleto e poses da Elyra HD (espelho em Python de scenes/player/hd_hero.gd),
 usado para gerar prévias (GIF) fora do Godot.
 
     python tools/hd_rig.py run saida.gif

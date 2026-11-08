@@ -1,12 +1,13 @@
 extends Node
-## Estado global do jogo (autoload "Game"): as oito Bestas-Simbionte (chefes),
-## suas fases e armas, as fraquezas, as peças de armadura, os Corações
-## Simbiontes, o que já foi coletado e o salvamento.
+## Estado global do jogo (autoload "Game"): os oito Guardiões (chefes), suas
+## fases e armas, as fraquezas, as peças da armadura rúnica, as Sementes da
+## Vida, o que já foi coletado e o salvamento.
 ##
-## Premissa: no planeta Ossária, as Bestas-Simbionte (criaturas bio-mecânicas
-## que guardavam o ecossistema) enlouqueceram. VEX-9, caçadora de armadura
-## simbionte, enfrenta as oito; de cada uma vencida, sua armadura absorve a
-## arma. Cada Besta é fraca contra a arma de outra.
+## Premissa: no reino élfico de Sylvaria, a Praga Cinzenta corrompeu os oito
+## Guardiões, espíritos-fera que protegiam a Árvore-Mãe e as florestas. Elyra,
+## sentinela élfica de armadura rúnica e manopla arcana, enfrenta os oito; de
+## cada um purificado, a armadura absorve o poder. Cada Guardião é fraco
+## contra o poder de outro.
 
 signal health_changed(current: int, maximum: int)
 signal weapon_changed(weapon: StringName)
@@ -26,46 +27,46 @@ const STAGE_SELECT_SCENE := "res://scenes/ui/stage_select.tscn"
 const LEVEL_SCENE := "res://scenes/level/level.tscn"
 const TITLE_SCENE := "res://scenes/ui/title.tscn"
 
-## As oito Bestas, na ordem da tela de seleção. `weak` é a arma que mais as
+## Os oito Guardiões, na ordem da tela de seleção. `weak` é a arma que mais as
 ## fere; `level` é o mapa da fase (vazio = ainda em construção).
 const BOSSES := [
-	{"id": &"wasp", "name": "Vespa de Plasma", "stage": "Colmeia de Plasma", "weapon": &"plasma_sting",
+	{"id": &"wasp", "name": "Vespa de Âmbar", "stage": "Colmeia da Árvore-Mãe", "weapon": &"plasma_sting",
 		"weak": &"seismic_hammer", "color": Color(1.0, 0.7, 0.15), "level": "res://levels/hive.gd"},
-	{"id": &"beetle", "name": "Escaravelho Tectônico", "stage": "Falha Tectônica", "weapon": &"seismic_hammer",
+	{"id": &"beetle", "name": "Escaravelho Rúnico", "stage": "Pedreira dos Ancestrais", "weapon": &"seismic_hammer",
 		"weak": &"abyss_jet", "color": Color(0.7, 0.5, 0.3), "level": ""},
-	{"id": &"squid", "name": "Lula Abissal", "stage": "Fossa Abissal", "weapon": &"abyss_jet",
+	{"id": &"squid", "name": "Serpente do Lago", "stage": "Lago das Ninfeias", "weapon": &"abyss_jet",
 		"weak": &"volt_discharge", "color": Color(0.3, 0.4, 0.9), "level": ""},
-	{"id": &"ray", "name": "Raia Elétrica", "stage": "Recife Voltaico", "weapon": &"volt_discharge",
+	{"id": &"ray", "name": "Cervo Trovejante", "stage": "Clareira das Tempestades", "weapon": &"volt_discharge",
 		"weak": &"spore_cloud", "color": Color(0.4, 0.9, 1.0), "level": ""},
-	{"id": &"fungus", "name": "Fungo Esporífero", "stage": "Pântano de Esporos", "weapon": &"spore_cloud",
+	{"id": &"fungus", "name": "Dríade Fúngica", "stage": "Pântano dos Cogumelos", "weapon": &"spore_cloud",
 		"weak": &"magma_shell", "color": Color(0.6, 0.85, 0.3), "level": ""},
-	{"id": &"snail", "name": "Caracol Vulcânico", "stage": "Caldeira Vulcânica", "weapon": &"magma_shell",
+	{"id": &"snail", "name": "Salamandra de Brasa", "stage": "Bosque Incendiado", "weapon": &"magma_shell",
 		"weak": &"glacier_blade", "color": Color(1.0, 0.35, 0.15), "level": ""},
-	{"id": &"mantis", "name": "Louva-a-deus Glacial", "stage": "Geleira Fóssil", "weapon": &"glacier_blade",
+	{"id": &"mantis", "name": "Louva-a-deus de Geada", "stage": "Bosque Invernal", "weapon": &"glacier_blade",
 		"weak": &"prism_dust", "color": Color(0.7, 0.9, 1.0), "level": ""},
-	{"id": &"moth", "name": "Mariposa de Cristal", "stage": "Caverna Prismática", "weapon": &"prism_dust",
+	{"id": &"moth", "name": "Mariposa Lunar", "stage": "Gruta da Lua", "weapon": &"prism_dust",
 		"weak": &"plasma_sting", "color": Color(0.9, 0.6, 1.0), "level": ""},
 ]
 
-## Armas: o canhão (infinito) e as das Bestas (gastam energia).
+## Armas: a manopla (infinita) e os poderes dos Guardiões (gastam energia).
 const WEAPONS := {
-	&"buster": {"name": "Canhão Simbionte", "color": Color(0.48, 1.0, 0.88), "cost": 0},
-	&"plasma_sting": {"name": "Ferrão de Plasma", "color": Color(1.0, 0.7, 0.2), "cost": 1},
-	&"seismic_hammer": {"name": "Martelo Sísmico", "color": Color(0.75, 0.55, 0.35), "cost": 2},
-	&"abyss_jet": {"name": "Jato Abissal", "color": Color(0.35, 0.45, 1.0), "cost": 1},
-	&"volt_discharge": {"name": "Descarga Voltaica", "color": Color(0.5, 0.95, 1.0), "cost": 2},
+	&"buster": {"name": "Manopla Arcana", "color": Color(0.55, 1.0, 0.7), "cost": 0},
+	&"plasma_sting": {"name": "Ferrão de Âmbar", "color": Color(1.0, 0.7, 0.2), "cost": 1},
+	&"seismic_hammer": {"name": "Martelo Rúnico", "color": Color(0.75, 0.55, 0.35), "cost": 2},
+	&"abyss_jet": {"name": "Maré das Ninfeias", "color": Color(0.35, 0.45, 1.0), "cost": 1},
+	&"volt_discharge": {"name": "Galhada Trovejante", "color": Color(0.5, 0.95, 1.0), "cost": 2},
 	&"spore_cloud": {"name": "Nuvem de Esporos", "color": Color(0.65, 0.9, 0.35), "cost": 2},
-	&"magma_shell": {"name": "Casco de Magma", "color": Color(1.0, 0.4, 0.15), "cost": 2},
-	&"glacier_blade": {"name": "Lâmina Glacial", "color": Color(0.75, 0.92, 1.0), "cost": 1},
-	&"prism_dust": {"name": "Pó Prismático", "color": Color(0.95, 0.65, 1.0), "cost": 2},
+	&"magma_shell": {"name": "Escama de Brasa", "color": Color(1.0, 0.4, 0.15), "cost": 2},
+	&"glacier_blade": {"name": "Lâmina de Geada", "color": Color(0.75, 0.92, 1.0), "cost": 1},
+	&"prism_dust": {"name": "Pó Lunar", "color": Color(0.95, 0.65, 1.0), "cost": 2},
 }
 
-## Peças da armadura simbionte, escondidas em casulos nas fases.
+## Peças da armadura rúnica, guardadas em relicários escondidos nas fases.
 const ARMOR := {
-	&"legs": {"name": "Pernas Saltadoras", "hint": "Dash no ar (uma vez por pulo)"},
-	&"arms": {"name": "Braços Condutores", "hint": "Carga máxima mais forte; armas das Bestas também carregam"},
-	&"body": {"name": "Carapaça Densa", "hint": "Metade do dano recebido"},
-	&"head": {"name": "Elmo Sensorial", "hint": "Revela paredes frágeis e itens escondidos"},
+	&"legs": {"name": "Botas do Vento", "hint": "Dash no ar (uma vez por pulo)"},
+	&"arms": {"name": "Braçadeiras Rúnicas", "hint": "Carga máxima mais forte; poderes dos Guardiões também carregam"},
+	&"body": {"name": "Peitoral de Prata-Lunar", "hint": "Metade do dano recebido"},
+	&"head": {"name": "Elmo do Vidente", "hint": "Revela paredes frágeis e itens escondidos"},
 }
 
 var defeated: Array[StringName] = []
@@ -81,7 +82,7 @@ var current_weapon: StringName = BUSTER
 ## Fase sendo jogada (caminho do mapa) e o chefe dela.
 var current_level := ""
 var current_boss: StringName = &""
-## Onde a caçadora renasce na fase atual (zero = no início).
+## Onde a sentinela renasce na fase atual (zero = no início).
 var checkpoint := Vector2.ZERO
 
 

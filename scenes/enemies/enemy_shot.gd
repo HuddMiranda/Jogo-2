@@ -1,5 +1,5 @@
 extends Area2D
-## Projétil inimigo: fere a caçadora e some ao bater numa parede.
+## Projétil inimigo: fere a sentinela e some ao bater numa parede.
 
 var velocity := Vector2.ZERO
 var fall_gravity := 0.0

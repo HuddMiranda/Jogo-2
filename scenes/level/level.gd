@@ -2,11 +2,11 @@ extends Node2D
 ## Uma fase, montada a partir de um mapa em texto (levels/*.gd, constante
 ## MAP). Cada caractere é um bloco de 16 × 16:
 ##   #  bloco sólido            =  plataforma vazada (sobe por baixo)
-##   ^  espinhos (morte na hora) P  início da caçadora
+##   ^  espinhos (morte na hora) P  início da sentinela
 ##   C  checkpoint (renasce aqui) G  fim da fase (fases sem chefe)
 ##   c  Rastejante   f  Zumbidor   t  Bulbo
 ##   h  vida pequena H  vida grande e  energia pequena E energia grande
-##   L  Coração Simbionte          A  casulo de armadura (peça em ARMOR)
+##   L  Semente da Vida             A  relicário de armadura (peça em ARMOR)
 ##   D  porta do chefe (coluna)    B  onde o chefe aparece
 ## Cair abaixo do mapa também mata. A câmera fica presa dentro do mapa e, na
 ## arena do chefe, presa à arena.
@@ -202,7 +202,7 @@ func _arena_rect() -> Rect2:
 	return Rect2(left, 0, width * T - left, height * T - 3 * T)
 
 
-# --- Caçadora, câmera e morte --------------------------------------------------------
+# --- Sentinela, câmera e morte --------------------------------------------------------
 
 func _spawn_player() -> void:
 	player = PLAYER_SCENE.instantiate() as Player
@@ -276,14 +276,14 @@ func _start_boss() -> void:
 		await get_tree().create_timer(0.6).timeout
 		_finish_stage()
 		return
-	# A Besta desce do alto da arena.
+	# O Guardião desce do alto da arena.
 	var landing := boss.global_position
 	boss.global_position = Vector2(landing.x, _arena_rect().position.y - 60.0)
 	boss.visible = true
 	var tween := create_tween()
 	tween.tween_property(boss, "global_position", landing, 1.0).set_ease(Tween.EASE_OUT)
 	await tween.finished
-	_hud.call("boss_intro", Game.boss_info(boss.boss_id).get("name", "Besta"))
+	_hud.call("boss_intro", Game.boss_info(boss.boss_id).get("name", "Guardião"))
 	await get_tree().create_timer(1.4).timeout
 	boss.start()
 	player.controls_enabled = true

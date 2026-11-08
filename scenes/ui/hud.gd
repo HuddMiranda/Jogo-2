@@ -7,7 +7,7 @@ extends CanvasLayer
 signal weapon_get_closed
 
 const FRAME := Color(0.05, 0.05, 0.08)
-const LIFE := Color(0.48, 1.0, 0.88)
+const LIFE := Color(0.55, 1.0, 0.7)
 const SEGMENT := 3.0
 
 var _boss_health := 0

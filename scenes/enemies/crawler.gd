@@ -1,6 +1,6 @@
 extends Enemy
 ## Rastejante: besouro alienígena que patrulha o chão, virando nas paredes e
-## beiradas; quando a caçadora está à frente, para e cospe ácido em arco.
+## beiradas; quando a sentinela está à frente, para e cospe ácido em arco.
 
 @export var speed := 45.0
 @export var spit_interval := 2.2

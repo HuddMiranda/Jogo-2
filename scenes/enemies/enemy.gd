@@ -28,7 +28,7 @@ func _ready() -> void:
 	collision_layer = 4
 	collision_mask = 1
 	health = max_health
-	# Área de contato com o mesmo formato do corpo (fere a caçadora).
+	# Área de contato com o mesmo formato do corpo (fere a sentinela).
 	_contact = Area2D.new()
 	_contact.collision_layer = 0
 	_contact.collision_mask = 2

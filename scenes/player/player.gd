@@ -1,6 +1,6 @@
 class_name Player
 extends CharacterBody2D
-## VEX-9, a caçadora de armadura simbionte. A origem do nó fica nos pés.
+## Elyra, a sentinela élfica de armadura rúnica. A origem do nó fica nos pés.
 ##
 ## Movimento (frenético, no estilo dos run-and-gun de 16/32 bits):
 ##   - corrida, pulo de altura variável (soltar o botão corta a subida);
@@ -11,7 +11,7 @@ extends CharacterBody2D
 ##   - com as Pernas Saltadoras: um dash no ar por pulo.
 ## Tiro: aperte para um disparo curto (até 3 na tela); segure para carregar
 ## (2 níveis; com os Braços Condutores a carga máxima fica mais forte e as
-## armas das Bestas também carregam). Q / E trocam de arma.
+## poderes dos Guardiões também carregam). Q / E trocam de arma.
 
 signal died
 
@@ -56,7 +56,7 @@ var _was_on_floor := true
 var _spinning := false
 var _dead := false
 
-## Sprite da caçadora: HDHero (arte HD recortada) ou HeroSprite (pixel art).
+## Sprite da sentinela: HDHero (arte HD recortada) ou HeroSprite (pixel art).
 @onready var sprite = $Sprite
 
 

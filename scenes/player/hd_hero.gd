@@ -1,6 +1,6 @@
 class_name HDHero
 extends Node2D
-## VEX-9 em alta resolução com animação recortada (cutout): peças desenhadas
+## Elyra em alta resolução com animação recortada (cutout): peças desenhadas
 ## à parte (art/hd/vex_parts/, geradas por tools/hd_parts.py) presas num
 ## esqueleto (quadril → tronco → pescoço/capacete e ombros → braços/canhão;
 ## quadril → coxas → canelas → pés). A cada quadro, cada articulação vai
@@ -36,7 +36,7 @@ const BLEND := 18.0
 var anim := "idle"
 var cannon := false
 var charge_level := 0
-var weapon_color := Color(0.48, 1.0, 0.88)
+var weapon_color := Color(0.55, 1.0, 0.7)
 var flash := 0.0
 var tint := Color.WHITE
 ## Parado no tempo (rastro do dash).

@@ -1,16 +1,16 @@
-# Simbionte — Guia de arte HD
+# Sylvaria — Guia de arte HD
 
 Guia para quem vai produzir a arte do jogo (artista, estúdio ou geração por IA). O jogo troca **sozinho** a pixel art provisória pela arte HD assim que os arquivos abaixo existirem, sem mexer em código.
 
 ## Direção de arte
 
 - **Estilo:** 2D **pintado à mão em alta resolução**, na linha de *Afterimage*: pinceladas suaves, iluminação dramática com luz de recorte (rim light), atmosfera densa, cenários em várias camadas de profundidade. Não é pixel art.
-- **Mundo:** o planeta **Ossária**, bio-mecânico e alienígena: ruínas de naves antigas tomadas por organismos vivos, favos, carapaças, veios que brilham.
-- **Tom:** sombrio e misterioso, com pontos de cor fortes nas fontes de luz (energia, gemas, visores).
-- **Protagonista — VEX-9:** caçadora em **armadura simbionte** fechada, proporções humanas (cerca de 7 cabeças), **paleta Marfim** (marfim, dourado, traje escuro, visor e gemas azuis):
-  - capacete anguloso: crista central, aba pontuda sobre os olhos, **visor em fenda** azul, máscara com saídas de ar, aleta na nuca;
-  - ombreiras grandes e arredondadas com filete dourado; peito com gema azul; cintura fina de traje escuro;
-  - braço direito termina num **canhão** com anéis dourados;
+- **Mundo:** o reino élfico de **Sylvaria**: florestas antigas de árvores colossais, ruínas élficas de pedra clara com entalhes dourados tomadas por musgo e raízes, colmeias de âmbar, lagos de ninfeias, vaga-lumes e runas que brilham. Uma praga cinzenta corrompe partes do reino.
+- **Tom:** melancólico e misterioso, com pontos de cor fortes nas fontes de luz (energia, gemas, visores).
+- **Protagonista — Elyra:** sentinela élfica em **armadura rúnica** fechada, proporções humanas (cerca de 7 cabeças), **paleta Marfim** (marfim, dourado, traje verde-floresta escuro, visor e gemas esmeralda):
+  - elmo élfico: crista dourada em forma de folha, **aletas longas como orelhas élficas** para trás, **visor amendoado** verde, gema na testa, máscara elegante; **cabelo prateado** comprido saindo pela nuca;
+  - ombreiras grandes e arredondadas com filete dourado; peito com gema esmeralda; cintura fina de traje escuro;
+  - braço direito com a **manopla arcana**: braçadeira com filigrana de folhas e um cristal de esmeralda preso por garras douradas (de onde sai o tiro);
   - coxa, joelheira, canela, tornozelo e pé como partes bem definidas.
   - Referência: o desenho em pixel art aprovado está em `art/handmade/vex_idle_ivory.png` (proporções e peças) e o conceito vetorial no canvas de design do projeto.
 
@@ -30,7 +30,7 @@ art/hd/<nome>/<animação>/0001.png, 0002.png, ...
 
 Todos os quadros de uma animação têm **o mesmo tamanho de tela** e o personagem na **mesma posição de pés**.
 
-`info.cfg` (exemplo da VEX-9):
+`info.cfg` (exemplo da Elyra):
 
 ```ini
 [sprite]
@@ -51,21 +51,21 @@ hurt=12
 idle_shoot=10
 
 [muzzle]
-; boca do canhão (onde nasce o tiro), em px do quadro, por animação
+; cristal da manopla (onde nasce o tiro), em px do quadro, por animação
 default=Vector2(230, 120)
 run_shoot=Vector2(236, 126)
 ```
 
 | Personagem (`<nome>`) | Tamanho em pé no desenho | Animações (quadros sugeridos) |
 |---|---|---|
-| `hero` (VEX-9) | ~192 px de altura | `idle` (8–12), `idle_shoot` (4), `run` (12–16), `run_shoot` (12–16, canhão à frente), `jump` (4), `jump_shoot` (2), `fall` (4), `fall_shoot` (2), `spin` (8–12, cambalhota), `dash` (4–6), `dash_shoot` (4), `wall` (4), `hurt` (3) |
-| `crawler` (Rastejante, besouro que cospe ácido) | ~64 px | `walk` (8), `shoot` (4) |
+| `hero` (Elyra) | ~192 px de altura | `idle` (8–12), `idle_shoot` (4), `run` (12–16), `run_shoot` (12–16, manopla à frente), `jump` (4), `jump_shoot` (2), `fall` (4), `fall_shoot` (2), `spin` (8–12, cambalhota), `dash` (4–6), `dash_shoot` (4), `wall` (4), `hurt` (3) |
+| `crawler` (Rastejante, besouro da floresta que cospe ácido) | ~64 px | `walk` (8), `shoot` (4) |
 | `flyer` (Zumbidor, inseto que mergulha) | ~56 px | `fly` (6) |
-| `turret` (Bulbo, casulo que se abre) | ~64 px | `closed` (1), `opening` (3), `open` (4) |
-| `wasp` (Vespa de Plasma, chefe) | ~300 px | `idle` (8–12), `dash` (4), `shoot` (6), `hurt` (2) |
+| `turret` (Bulbo, flor carnívora que se abre) | ~64 px | `closed` (1), `opening` (3), `open` (4) |
+| `wasp` (Vespa de Âmbar, chefe) | ~300 px | `idle` (8–12), `dash` (4), `shoot` (6), `hurt` (2) |
 | `items` | ~48 px cada | `health_small`, `health_big`, `energy_small`, `energy_big`, `heart`, `capsule` (4–6 cada) |
 
-Animações `_shoot` são as mesmas poses com o canhão apontado para a frente; se não existirem, o jogo usa a animação normal.
+Animações `_shoot` são as mesmas poses com a manopla apontado para a frente; se não existirem, o jogo usa a animação normal.
 
 ### Blocos do mapa
 
@@ -92,15 +92,15 @@ Camadas de **1080 px de altura** (largura livre, de preferência 3840 px), que *
 
 ## Ordem de prioridade
 
-1. **VEX-9:** `idle`, `run`, `run_shoot`, `jump`, `fall`, `spin` — o resto pode vir depois.
-2. Blocos e fundo das **Ruínas da Nave-Semente** (`ruins`).
+1. **Elyra:** `idle`, `run`, `run_shoot`, `jump`, `fall`, `spin` — o resto pode vir depois.
+2. Blocos e fundo das **Ruínas de Aelindor** (`ruins`).
 3. Inimigos (`crawler`, `flyer`, `turret`).
-4. Blocos e fundo da **Colmeia de Plasma** (`hive`) e a **Vespa de Plasma**.
+4. Blocos e fundo da **Colmeia da Árvore-Mãe** (`hive`) e a **Vespa de Âmbar**.
 5. Itens.
 
 ## Como conseguir a arte
 
-- **Artista contratado:** o caminho para um jogo comercial. Procure portfólios de *2D game art / animation* (ArtStation, Behance, Fiverr, Upwork, grupos de gamedev). Mande este guia; peça primeiro um teste com a VEX-9 parada.
+- **Artista contratado:** o caminho para um jogo comercial. Procure portfólios de *2D game art / animation* (ArtStation, Behance, Fiverr, Upwork, grupos de gamedev). Mande este guia; peça primeiro um teste com a Elyra parada.
 - **IA de imagem:** dá bons quadros soltos, mas manter o **mesmo personagem idêntico** em dezenas de quadros de animação é difícil. Serve bem para **fundos** e **conceitos**; para animação, use como base e peça retoques.
 - **Pacotes prontos** (itch.io, Unity Asset Store, GameDev Market): rápidos e baratos para cenários e efeitos; confira a licença para uso comercial na Steam.
 

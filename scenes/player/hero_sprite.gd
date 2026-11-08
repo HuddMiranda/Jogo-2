@@ -1,7 +1,7 @@
 @tool
 class_name HeroSprite
 extends SheetSprite
-## Sprite da caçadora: corpo + braço-canhão (com a ombreira da frente)
+## Sprite da sentinela: corpo + braço-canhão (com a ombreira da frente)
 ## desenhado por cima, abaixado ou apontado (ao atirar), com o brilho da carga
 ## na boca do canhão.
 
@@ -9,7 +9,7 @@ extends SheetSprite
 var cannon := false
 ## Nível da carga (0, 1, 2) e cor da arma atual.
 var charge_level := 0
-var weapon_color := Color(0.48, 1.0, 0.88)
+var weapon_color := Color(0.55, 1.0, 0.7)
 
 
 ## Na arte HD, atirando usa a animação "<nome>_shoot" (se existir).

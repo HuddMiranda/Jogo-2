@@ -1,5 +1,5 @@
 extends Enemy
-## Zumbidor: drone-inseto que paira e, quando a caçadora chega perto,
+## Zumbidor: drone-inseto que paira e, quando a sentinela chega perto,
 ## mergulha em linha reta onde ela está e volta a subir.
 
 enum State { HOVER, DIVE, RISE }

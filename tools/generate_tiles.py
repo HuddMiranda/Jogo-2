@@ -30,17 +30,26 @@ def c(*v): return np.array(v, dtype=np.float32)
 
 
 BIOMES = {
-    # Ruínas bio-mecânicas (fase de abertura): placas de metal tomadas por veios vivos.
-    'ruins': dict(base=c(70, 82, 92), light=c(104, 120, 132), dark=c(40, 48, 58), mortar=c(20, 26, 34),
-                  top=c(40, 150, 140), top_light=c(110, 255, 220), drip=c(30, 110, 104), pattern='panel',
-                  ledge='slab', wood=c(84, 96, 108), wood_light=c(130, 146, 160), wood_dark=c(46, 54, 64),
-                  wall=c(22, 28, 36), wall_light=c(32, 40, 50), wall_mortar=c(12, 16, 22)),
-    # Colmeia de Plasma (fase da Vespa): cera âmbar e favos.
-    'hive': dict(base=c(150, 96, 30), light=c(200, 140, 50), dark=c(90, 54, 18), mortar=c(48, 26, 8),
-                 top=c(230, 170, 60), top_light=c(255, 230, 140), drip=c(200, 130, 40), pattern='comb',
-                 ledge='sinew', wood=c(170, 110, 40), wood_light=c(230, 170, 80), wood_dark=c(100, 60, 20),
-                 accent=c(255, 200, 80), wall=c(44, 26, 12), wall_light=c(64, 40, 18), wall_mortar=c(24, 12, 4)),
+    # Ruínas de Aelindor (fase de abertura): pedra clara élfica com entalhes
+    # dourados, tomada por musgo; galhos vivos servem de plataforma.
+    'ruins': dict(base=c(150, 150, 132), light=c(196, 194, 172), dark=c(96, 98, 86), mortar=c(44, 50, 42),
+                  top=c(62, 118, 52), top_light=c(140, 196, 90), drip=c(46, 92, 44), pattern='elven',
+                  ledge='branch', wood=c(104, 74, 48), wood_light=c(150, 112, 72), wood_dark=c(60, 40, 26),
+                  leaf=c(86, 150, 64), accent=c(226, 184, 84),
+                  wall=c(20, 34, 30), wall_light=c(34, 54, 44), wall_mortar=c(10, 18, 16), wall_glow=c(150, 230, 140)),
+    # Colmeia da Árvore-Mãe (fase da Vespa): favos de âmbar dentro do tronco
+    # gigante, com cipós por cima.
+    'hive': dict(base=c(170, 104, 30), light=c(222, 156, 56), dark=c(104, 58, 18), mortar=c(56, 32, 14),
+                 top=c(70, 110, 44), top_light=c(150, 190, 80), drip=c(210, 140, 40), pattern='comb',
+                 ledge='branch', wood=c(96, 64, 40), wood_light=c(142, 100, 62), wood_dark=c(54, 34, 20),
+                 leaf=c(96, 146, 60), accent=c(255, 200, 80),
+                 wall=c(46, 30, 18), wall_light=c(66, 44, 24), wall_mortar=c(24, 14, 8)),
 }
+
+# Entalhes élficos (folha, runa, arco), em ouro, 5 × 5.
+CARVINGS = [["00100", "01110", "11111", "01110", "00100"],
+            ["01010", "00100", "11111", "00100", "01010"],
+            ["01110", "10001", "10101", "10001", "00000"]]
 
 
 def noise(w, h, rng, scale=4):
@@ -84,6 +93,33 @@ def material(b, w, h, rng, deep=False):
                     if 0 <= rx < w - 1:
                         img[y0 + 3, rx] = np.minimum(tone + 60, 255)
                         img[y0 + 4, rx] = tone * 0.6
+        return img
+    if pattern == 'elven':
+        # Cantaria élfica: blocos lisos de pedra clara, chanfrados, com
+        # entalhes dourados de vez em quando.
+        for y0 in range(0, h, 8):
+            offset = 8 if (y0 // 8) % 2 else 0
+            for x0 in range(-offset, w, 16):
+                tone = base + (light - base) * rng.uniform(0.0, 0.4)
+                x1, x2 = max(x0, 0), min(x0 + 16, w)
+                img[y0:y0 + 8, x1:x2] = tone[None, None, :] * (0.94 + 0.1 * n[y0:y0 + 8, x1:x2, None])
+                img[y0, x1:x2] = np.minimum(tone + 26, 255)
+                img[y0 + 1, x1:x2] = np.minimum(tone + 10, 255)
+                img[min(y0 + 6, h - 1), x1:x2] = tone * 0.8
+                if not deep and rng.random() < 0.22 and x0 + 10 < w and x0 + 5 >= 0:
+                    glyph = rng.choice(CARVINGS)
+                    gx = x0 + 5
+                    for j in range(3):
+                        for i, ch in enumerate(glyph[j + 1][1:4]):
+                            if ch == '1' and 0 <= gx + i < w:
+                                img[y0 + 2 + j, gx + i] = b['accent'] * (1.0 if j == 0 else 0.8)
+                if rng.random() < 0.18:                               # musgo nas frestas
+                    mx = rng.randint(x1, max(x1, x2 - 1))
+                    img[min(y0 + 6, h - 1), mx] = b['top'] * (0.6 if deep else 0.9)
+            img[min(y0 + 7, h - 1), :] = mortar
+            for x0 in range(-offset, w + 16, 16):
+                if 0 <= x0 < w:
+                    img[y0:y0 + 8, x0] = mortar
         return img
     if pattern == 'comb':
         # Favos: células redondas e brilhantes de cera.
@@ -169,6 +205,12 @@ def add_top(img, b, rng):
         if rng.random() < 0.18:                                       # gota / fio escorrendo
             img[depth:depth + rng.randint(1, 4), x] = drip
     img[min(4, h - 1), :] = img[min(4, h - 1), :] * 0.8               # sombra logo abaixo
+    if 'leaf' in b:
+        for x in range(1, w - 1, 3):                                  # folhinhas e flores no musgo
+            if rng.random() < 0.3:
+                img[1, x] = b['leaf'] * 1.2
+            if rng.random() < 0.06:
+                img[1, x] = c(240, 230, 190)
     if b.get('icicles'):
         for x in range(1, w - 1, 5):                                  # pingentes de gelo
             if rng.random() < 0.5:
@@ -223,6 +265,23 @@ def ledge_tile(b, rng, part):
                     img[6 + n - 1, x, :3] = wl
         else:
             img[6, 2:T - 2, :3] = wd * 0.7; img[6, 2:T - 2, 3] = 255
+    elif kind == 'branch':
+        # Galho vivo: casca com veios, folhas por cima.
+        for x in range(T):
+            y = 2 + int(round(np.sin(x / T * np.pi * 2 + 0.6) * 0.7))
+            img[y:y + 4, x, :3] = wood; img[y:y + 4, x, 3] = 255
+            img[y, x, :3] = wl
+            img[y + 3, x, :3] = wd
+            if x % 5 == 2:
+                img[y + 2, x, :3] = wd
+        for x in range(0, T, 4):
+            if rng.random() < 0.6:
+                lx = x + rng.randint(0, 2)
+                img[0:2, lx, :3] = b['leaf']; img[0:2, lx, 3] = 255
+                img[0, lx, :3] = b['leaf'] * 1.3
+        if part in ('left', 'right', 'single'):
+            x = 3 if part != 'right' else 12
+            img[6:10, x, :3] = b['leaf'] * 0.7; img[6:10, x, 3] = 255  # folha pendurada
     elif kind == 'sinew':
         for x in range(T):
             y = 2 + int(round(np.sin(x / T * np.pi * 2) * 0.8))
@@ -260,7 +319,37 @@ def wall_texture(b, rng):
     n2 = noise(S, S, rng, 4)
     wall, wl, wm = b['wall'], b['wall_light'], b['wall_mortar']
     img[:] = wall[None, None, :] * (0.85 + 0.25 * n[:, :, None] + 0.1 * n2[:, :, None])
-    pattern = {'panel': 'brick'}.get(b['pattern'], b['pattern'])
+    pattern = {'panel': 'brick', 'elven': 'forest'}.get(b['pattern'], b['pattern'])
+    if pattern == 'forest':
+        # Floresta escura ao fundo: troncos verticais com casca, copas e
+        # vaga-lumes (repete a cada 128 px).
+        for trunk in range(4):
+            cx = trunk * 32 + rng.randint(4, 14)
+            tw = rng.randint(7, 13)
+            tone = wl * rng.uniform(1.0, 1.35)
+            for x in range(cx, cx + tw):
+                xx = x % S
+                k = (x - cx) / tw
+                img[:, xx] = tone[None, :] * (0.75 + 0.45 * np.sin(k * np.pi)) * (0.9 + 0.15 * n2[:, xx, None])
+                if (x - cx) % 3 == 1:                                  # veios da casca
+                    img[:, xx] *= 0.85
+            for _ in range(3):                                         # nós e musgo
+                y = rng.randrange(S)
+                img[y:y + 3, (cx + tw // 2) % S] = wm
+        for _ in range(70):                                            # folhagem (cachos de folhas)
+            x, y = rng.randrange(S), rng.randrange(S)
+            r = rng.randint(1, 3)
+            ys, xs = np.ogrid[0:S, 0:S]
+            dx = np.minimum(np.abs(xs - x), S - np.abs(xs - x))
+            dy = np.minimum(np.abs(ys - y), S - np.abs(ys - y))
+            mask = (dx * dx + dy * dy) < r * r
+            img[mask] = wall * 1.5 + c(0, 14, 4)
+            img[(y - r) % S, x] = wall * 2.0 + c(0, 20, 6)
+        for _ in range(10):                                            # vaga-lumes
+            x, y = rng.randrange(1, S - 1), rng.randrange(1, S - 1)
+            img[y, x] = b['wall_glow'] * 0.8
+            img[y - 1, x] = img[y + 1, x] = img[y, x - 1] = img[y, x + 1] = b['wall_glow'] * 0.3
+        return img
     if pattern == 'comb':
         # Favos grandes e escuros ao fundo (repete a cada 128 px).
         ys, xs = np.mgrid[0:S, 0:S].astype(np.float32)
@@ -357,7 +446,7 @@ def grime(img, b, rng, amount):
         x = rng.randrange(w)
         y = rng.randrange(h)
         length = rng.randint(6, 30)
-        tone = c(40, 6, 10) if rng.random() < 0.3 else c(0, 0, 0)
+        tone = c(0, 0, 0)
         for k in range(length):
             yy = (y + k) % h
             alpha = 0.45 * (1 - k / length)
@@ -383,7 +472,7 @@ def build(name, b):
     for col, part in enumerate(('left', 'mid', 'mid', 'mid', 'right', 'single')):
         atlas.paste(to_image(ledge_tile(b, rng, part)), (col * T, 3 * T))
     atlas.save(os.path.join(OUT, f'{name}.png'))
-    to_image(grime(wall_texture(b, rng), b, rng, 26)).save(os.path.join(OUT, f'{name}_wall.png'))
+    to_image(grime(wall_texture(b, rng), b, rng, 8)).save(os.path.join(OUT, f'{name}_wall.png'))
 
 
 def main():

@@ -1,7 +1,7 @@
 class_name Pickup
 extends Area2D
-## Item: vida (pequena/grande), energia de arma (pequena/grande), Coração
-## Simbionte (vida máxima +2) ou casulo com uma peça de armadura.
+## Item: vida (pequena/grande), energia de arma (pequena/grande), Semente
+## da Vida (vida máxima +2) ou relicário com uma peça de armadura.
 ## Itens soltos por inimigos (temporary) caem até o chão e somem depois de
 ## um tempo; corações e casulos ficam no lugar e só existem uma vez.
 
@@ -72,7 +72,7 @@ func _on_body_entered(body: Node) -> void:
 			Game.collect(item_id)
 			Game.add_heart(item_id)
 			Sfx.play(&"pickup")
-			_announce("CORAÇÃO SIMBIONTE", "Vida máxima aumentada")
+			_announce("SEMENTE DA VIDA", "Vida máxima aumentada")
 		"capsule":
 			Game.collect(item_id)
 			Game.add_armor(armor_part)

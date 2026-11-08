@@ -1,8 +1,8 @@
 extends Boss
 ## Vespa de Plasma: paira no alto da arena e alterna três ataques:
-##   - investida: brilha, mira na altura da caçadora e atravessa a arena;
+##   - investida: brilha, mira na altura da sentinela e atravessa a arena;
 ##   - ferrões: sobe e dispara um leque de ferrões de plasma;
-##   - mergulho: posiciona-se sobre a caçadora e despenca com o ferrão.
+##   - mergulho: posiciona-se sobre a sentinela e despenca com o ferrão.
 ## Com metade da vida fica mais rápida e o leque ganha mais ferrões.
 ## Fraqueza: Martelo Sísmico. Ao ser vencida, ensina o Ferrão de Plasma.
 
@@ -26,7 +26,7 @@ func _ai(delta: float) -> void:
 	var to_player := player.global_position - global_position
 	match _state:
 		State.HOVER:
-			# Vai para o alto do lado oposto da arena e encara a caçadora.
+			# Vai para o alto do lado oposto da arena e encara a sentinela.
 			sprite.play("idle")
 			if absf(to_player.x) > 4.0:
 				facing = signf(to_player.x)

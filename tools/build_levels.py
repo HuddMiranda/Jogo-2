@@ -96,7 +96,7 @@ def intro():
     m.put(218, 18, 't')
     m.put(228, 18, 'G')
     m.fill(231, 231, 0, H - 1)
-    write('intro', 'Ruínas da Nave-Semente', 'ruins', m, armor='legs')
+    write('intro', 'Ruínas de Aelindor', 'ruins', m, armor='legs')
 
 
 def hive():
@@ -155,7 +155,7 @@ def hive():
     m.ground(259, 299)
     m.fill(299, 299, 0, H - 1)
     m.put(290, 10, 'B')
-    write('hive', 'Colmeia de Plasma', 'hive', m, boss='wasp', armor='arms')
+    write('hive', 'Colmeia da Árvore-Mãe', 'hive', m, boss='wasp', armor='arms')
 
 
 if __name__ == '__main__':

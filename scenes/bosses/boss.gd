@@ -1,8 +1,8 @@
 class_name Boss
 extends CharacterBody2D
-## Base dos chefes (Bestas-Simbionte): barra de vida, invencibilidade curta
+## Base dos chefes (Guardiões corrompidos): barra de vida, invencibilidade curta
 ## depois de cada golpe, fraqueza (a arma certa fere 4 vezes mais e faz a
-## Besta cambalear), dano ao encostar e a explosão final. A fase chama
+## Guardião cambalear), dano ao encostar e a explosão final. A fase chama
 ## start() quando a luta começa e escuta `defeated`.
 
 signal defeated
@@ -46,7 +46,7 @@ func _ready() -> void:
 
 func start() -> void:
 	fighting = true
-	Game.boss_fight_started.emit(Game.boss_info(boss_id).get("name", "Besta"))
+	Game.boss_fight_started.emit(Game.boss_info(boss_id).get("name", "Guardião"))
 	Game.boss_health_changed.emit(health, max_health)
 	Sfx.play(&"boss_roar")
 

@@ -1,6 +1,6 @@
 extends Enemy
 ## Bulbo: casulo preso ao chão. Fechado, rebate os tiros; abre de tempos em
-## tempos, cospe três esporos em leque na direção da caçadora e fecha de novo.
+## tempos, cospe três esporos em leque na direção da sentinela e fecha de novo.
 
 @export var cycle := 2.6
 var _timer := 0.0

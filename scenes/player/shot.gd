@@ -1,6 +1,6 @@
 class_name Shot
 extends Area2D
-## Disparo da caçadora. O visual e o comportamento dependem da arma:
+## Disparo da sentinela. O visual e o comportamento dependem da arma:
 ##   buster        — nível 0: tiro curto; 1: tiro médio; 2: rajada carregada
 ##                   (atravessa os inimigos que derruba);
 ##   plasma_sting  — Ferrão de Plasma: persegue o inimigo mais próximo;

@@ -1,5 +1,5 @@
 ## Mapa gerado por tools/build_levels.py (legenda em scenes/level/level.gd).
-const NAME := "Colmeia de Plasma"
+const NAME := "Colmeia da Árvore-Mãe"
 const BIOME := "hive"
 const ARMOR := &"arms"
 const BOSS := &"wasp"

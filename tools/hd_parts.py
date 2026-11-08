@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Peças da VEX-9 em alta resolução, para a animação recortada (cutout).
+"""Peças da Elyra em alta resolução, para a animação recortada (cutout).
 
     python tools/hd_parts.py        (usa o Chromium do Playwright: npm/pip playwright)
 
@@ -34,33 +34,39 @@ DEFS = '''
   <stop offset="0" stop-color="#fff0b0"/><stop offset="0.5" stop-color="#e2ae44"/><stop offset="1" stop-color="#8a5e1c"/>
 </linearGradient>
 <linearGradient id="suit" x1="0" y1="0" x2="1" y2="0">
-  <stop offset="0" stop-color="#45405a"/><stop offset="1" stop-color="#15131c"/>
+  <stop offset="0" stop-color="#2f5446"/><stop offset="1" stop-color="#0c1c16"/>
 </linearGradient>
 <linearGradient id="visor" x1="0" y1="0" x2="1" y2="1">
-  <stop offset="0" stop-color="#e8f4ff"/><stop offset="0.35" stop-color="#5aa8ff"/><stop offset="1" stop-color="#1a3a9a"/>
+  <stop offset="0" stop-color="#f0fff0"/><stop offset="0.35" stop-color="#5ee89a"/><stop offset="1" stop-color="#0e5a3a"/>
 </linearGradient>
 <radialGradient id="gem" cx="0.35" cy="0.35" r="0.7">
-  <stop offset="0" stop-color="#f0f6ff"/><stop offset="0.45" stop-color="#4a7aff"/><stop offset="1" stop-color="#14287a"/>
+  <stop offset="0" stop-color="#f0fff4"/><stop offset="0.45" stop-color="#2ec27a"/><stop offset="1" stop-color="#0a4a2c"/>
 </radialGradient>
+<linearGradient id="hair" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0" stop-color="#f4f6f0"/><stop offset="1" stop-color="#a8b4b0"/>
+</linearGradient>
 <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
-  <stop offset="0" stop-color="#d8ecff" stop-opacity="1"/><stop offset="1" stop-color="#5aa8ff" stop-opacity="0"/>
+  <stop offset="0" stop-color="#e4ffe8" stop-opacity="1"/><stop offset="1" stop-color="#5ee89a" stop-opacity="0"/>
 </radialGradient>
 '''
 S = f'stroke="{LINE}" stroke-width="2" stroke-linejoin="round"'
-RIM = 'fill="none" stroke="#cfe6ff" stroke-width="1.6" stroke-linecap="round" opacity="0.7"'
+RIM = 'fill="none" stroke="#e4ffe8" stroke-width="1.6" stroke-linecap="round" opacity="0.7"'
 
 # nome: (caixa [x0, y0, x1, y1] em unidades, conteúdo SVG)
 PARTS = {
-    'helmet': ([-40, -50, 40, 4], f'''
-<path d="M-22 -26 L-38 -36 L-31 -21 Z" fill="url(#armorDark)" {S}/>
-<path d="M-24 -6 C -30 -30 -16 -46 4 -46 C 22 -46 30 -36 30 -25 L 37 -20 L 26 -16 C 26 -8 22 -2 14 0 L -16 0 C -22 0 -24 -2 -24 -6 Z" fill="url(#armor)" {S}/>
-<path d="M-3 -46 C 6 -45 11 -40 13 -33 L 7 -31 C 5 -37 1 -41 -6 -44 Z" fill="url(#gold)" {S}/>
-<path d="M7 -27 L 33 -21 L 31 -15 L 7 -19 Z" fill="url(#visor)" {S}/>
-<path d="M11 -24 L 27 -20.5" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/>
-<path d="M6 -16 L 26 -14 C 24 -6 20 -2 12 0 L 3 0 Z" fill="url(#armor)" {S}/>
-<rect x="12" y="-10" width="3" height="5" rx="1" fill="{LINE}"/><rect x="17" y="-9" width="3" height="5" rx="1" fill="{LINE}"/>
-<rect x="-12" y="-25" width="11" height="11" rx="2" fill="url(#gold)" {S}/>
-<path d="M-21 -10 C -26 -26 -16 -40 0 -43" {RIM}/>
+    'helmet': ([-54, -58, 40, 40], f'''
+<path d="M-16 -30 C -34 -26 -48 -6 -50 34 C -42 18 -38 8 -32 0 C -34 14 -36 24 -42 36 C -26 20 -22 4 -18 -6 C -16 4 -18 12 -22 20 C -10 6 -8 -8 -8 -18 Z" fill="url(#hair)" {S}/>
+<path d="M-24 -18 C -34 -6 -40 10 -42 24" fill="none" stroke="#ffffff" stroke-width="1.2" opacity="0.6"/>
+<path d="M-6 -24 L -40 -40 L -30 -24 L -12 -15 Z" fill="url(#armorDark)" {S}/>
+<path d="M-22 -8 C -26 -30 -12 -46 6 -45 C 22 -44 30 -34 30 -24 L 32 -16 L 24 -12 C 24 -6 20 -2 14 0 L -14 0 C -20 0 -22 -3 -22 -8 Z" fill="url(#armor)" {S}/>
+<path d="M20 -36 C 8 -52 -14 -56 -30 -46 C -14 -48 2 -46 14 -34 Z" fill="url(#gold)" {S}/>
+<path d="M8 -26 C 16 -30 26 -29 31 -22 C 24 -19 15 -19 8 -22 Z" fill="url(#visor)" {S}/>
+<path d="M12 -25 C 18 -27 24 -26 28 -23" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity="0.9"/>
+<path d="M6 -17 L 25 -14 C 23 -6 19 -2 12 0 L 3 0 Z" fill="url(#armor)" {S}/>
+<path d="M-2 -26 C -14 -30 -30 -36 -44 -40 C -34 -30 -20 -20 -4 -15 Z" fill="url(#armor)" {S}/>
+<path d="M-6 -22 C -18 -26 -28 -31 -36 -36" fill="none" stroke="url(#gold)" stroke-width="2" stroke-linecap="round"/>
+<circle cx="20" cy="-33" r="2.6" fill="url(#gem)" {S}/>
+<path d="M-20 -10 C -24 -26 -14 -40 0 -43" {RIM}/>
 '''),
     'torso': ([-24, -64, 24, 12], f'''
 <rect x="-6" y="-62" width="12" height="10" rx="2" fill="url(#suit)" {S}/>
@@ -88,14 +94,17 @@ PARTS = {
 <path d="M-8 -3 C -8 -5 8 -5 8 -3 L 9 22 C 6 24 -6 24 -9 22 Z" fill="url(#armor)" {S}/>
 <rect x="-9" y="4" width="18" height="4" rx="1.5" fill="url(#gold)" {S}/>
 '''),
-    'cannon': ([-15, -7, 15, 48], f'''
+    'cannon': ([-15, -7, 15, 50], f'''
 <rect x="-6" y="-5" width="12" height="10" rx="4" fill="url(#suit)" {S}/>
-<rect x="-11" y="0" width="22" height="42" rx="9" fill="url(#armor)" {S}/>
-<rect x="-12" y="7" width="24" height="5" rx="2" fill="url(#gold)" {S}/>
-<rect x="-12" y="29" width="24" height="4" rx="2" fill="url(#gold)" {S}/>
-<ellipse cx="0" cy="41" rx="9" ry="4" fill="#2a2420" {S}/>
-<ellipse cx="0" cy="41" rx="6" ry="2.4" fill="url(#visor)"/>
-<path d="M-7 4 L -7 36" {RIM}/>
+<path d="M-9 0 C -9 -4 9 -4 9 0 L 7 27 L -7 27 Z" fill="url(#armor)" {S}/>
+<rect x="-10" y="6" width="20" height="4" rx="1.5" fill="url(#gold)" {S}/>
+<path d="M-5 13 C -1 16 1 20 -2 24 M 4 13 C 1 17 2 21 5 23" fill="none" stroke="url(#gold)" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M-8 26 L -11 40 L -4 33 Z" fill="url(#gold)" {S}/>
+<path d="M8 26 L 11 40 L 4 33 Z" fill="url(#gold)" {S}/>
+<circle cx="0" cy="38" r="9" fill="url(#glow)" opacity="0.55"/>
+<path d="M0 27 L 5 35 L 0 46 L -5 35 Z" fill="url(#gem)" {S}/>
+<path d="M-1 30 L -3 35" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round"/>
+<path d="M-6 4 L -5 24" {RIM}/>
 '''),
     'thigh': ([-13, -6, 13, 38], f'''
 <path d="M-10 -3 C -10 -6 10 -6 10 -3 L 8 34 C 4 36 -4 36 -7 34 Z" fill="url(#armor)" {S}/>

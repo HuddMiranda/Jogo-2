@@ -1,5 +1,5 @@
 ## Mapa gerado por tools/build_levels.py (legenda em scenes/level/level.gd).
-const NAME := "Ruínas da Nave-Semente"
+const NAME := "Ruínas de Aelindor"
 const BIOME := "ruins"
 const ARMOR := &"legs"
 const MAP := """

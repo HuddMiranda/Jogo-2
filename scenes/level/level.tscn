@@ -1,0 +1,23 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/level/level.gd" id="1_level"]
+[ext_resource type="Script" path="res://scenes/level/background.gd" id="2_bg"]
+[ext_resource type="Script" path="res://scenes/level/tiles.gd" id="3_tiles"]
+[ext_resource type="Script" path="res://scenes/ui/hud.gd" id="4_hud"]
+
+[node name="Level" type="Node2D"]
+script = ExtResource("1_level")
+
+[node name="BackgroundLayer" type="CanvasLayer" parent="."]
+layer = -10
+
+[node name="Background" type="Node2D" parent="BackgroundLayer"]
+script = ExtResource("2_bg")
+
+[node name="Tiles" type="Node2D" parent="."]
+script = ExtResource("3_tiles")
+
+[node name="World" type="Node2D" parent="."]
+
+[node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource("4_hud")

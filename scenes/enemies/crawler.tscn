@@ -1,0 +1,24 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/enemies/crawler.gd" id="1_ai"]
+[ext_resource type="Script" path="res://scenes/common/sheet_sprite.gd" id="2_sprite"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
+size = Vector2(24, 14)
+
+[node name="Crawler" type="CharacterBody2D"]
+script = ExtResource("1_ai")
+max_health = 3
+contact_damage = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -7)
+shape = SubResource("RectangleShape2D_body")
+
+[node name="Sprite" type="Node2D" parent="."]
+script = ExtResource("2_sprite")
+sheet = "crawler"
+
+[node name="Ledge" type="RayCast2D" parent="."]
+position = Vector2(14, -4)
+target_position = Vector2(0, 12)

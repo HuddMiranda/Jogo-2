@@ -49,6 +49,10 @@ Correndo, o canhão vai apontado para a frente. **Pular correndo** vira **cambal
 | Louva-a-deus Glacial | Geleira Fóssil | Lâmina Glacial | Pó Prismático |
 | Mariposa de Cristal | Caverna Prismática | Pó Prismático | Ferrão de Plasma |
 
+## VEX-9 em alta resolução (animação recortada)
+
+A protagonista já usa **arte em alta resolução com animação recortada (cutout)**: peças vetoriais com volume, gradientes e luz de recorte (`tools/hd_parts.py` → `art/hd/vex_parts/`) presas num esqueleto em `scenes/player/hd_hero.gd`. Cada articulação vai **suavemente** de uma pose para a outra a cada quadro, então correr, parar, pular, pousar e virar fluem sem "pulos" entre quadros. Prévias em GIF fora do Godot: `python tools/hd_rig.py run saida.gif` (mesmas poses). Um artista pode repintar as peças mantendo tamanho e pivô.
+
 ## Arte HD (em preparação)
 
 A direção de arte definitiva é **2D pintada em alta resolução** (no estilo de *Afterimage*). O jogo já está pronto para recebê-la: personagens (`art/hd/<nome>/`), blocos do mapa (`art/hd/tiles/<bioma>.png`) e fundos em camadas (`art/hd/backgrounds/<bioma>/`) **substituem sozinhos** a pixel art provisória quando os arquivos existem. Tudo o que o artista precisa (estilo, tamanhos, animações, nomes de arquivo, prioridades) está em **[docs/ARTE_HD.md](docs/ARTE_HD.md)**. Ao exportar o jogo, inclua `*.cfg` no filtro de arquivos não-recurso (para os `info.cfg`).

@@ -56,7 +56,8 @@ var _was_on_floor := true
 var _spinning := false
 var _dead := false
 
-@onready var sprite: HeroSprite = $Sprite
+## Sprite da caçadora: HDHero (arte HD recortada) ou HeroSprite (pixel art).
+@onready var sprite = $Sprite
 
 
 func _ready() -> void:
@@ -268,11 +269,17 @@ func _fire(level: int) -> void:
 
 
 func _spawn_ghost() -> void:
-	var ghost := SheetSprite.new()
-	ghost.sheet = "hero"
-	ghost.anim = sprite.anim
-	ghost.speed = 0.0
-	ghost.tint = Color(Game.weapon_color(), 0.5)
+	var ghost: Node2D
+	if sprite.has_method("make_ghost"):
+		ghost = sprite.make_ghost()
+		ghost.modulate = Color(Game.weapon_color(), 0.5)
+	else:
+		var sheet := SheetSprite.new()
+		sheet.sheet = "hero"
+		sheet.anim = sprite.anim
+		sheet.speed = 0.0
+		sheet.tint = Color(Game.weapon_color(), 0.5)
+		ghost = sheet
 	ghost.scale = sprite.scale
 	get_parent().add_child(ghost)
 	ghost.global_position = global_position

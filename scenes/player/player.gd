@@ -52,6 +52,8 @@ var _hurt_timer := 0.0
 var _invincible := 0.0
 var _ghost_timer := 0.0
 var _was_on_floor := true
+## Pulo em cambalhota (pulou correndo); acaba ao atirar, na parede ou no chão.
+var _spinning := false
 var _dead := false
 
 @onready var sprite: HeroSprite = $Sprite
@@ -113,6 +115,7 @@ func _physics_process(delta: float) -> void:
 		_air_dash_used = false
 		if not _was_on_floor:
 			_dash_jump = false
+			_spinning = false
 			Sfx.play(&"land", 1.0, -6.0)
 	else:
 		_coyote -= delta
@@ -155,6 +158,7 @@ func _physics_process(delta: float) -> void:
 		if _coyote > 0.0:
 			velocity.y = -jump_speed
 			_dash_jump = _dash_timer > 0.0 or dash_held
+			_spinning = absf(velocity.x) > 40.0 or direction != 0.0
 			_dash_timer = 0.0
 			_coyote = 0.0
 			_buffer = 0.0
@@ -165,6 +169,7 @@ func _physics_process(delta: float) -> void:
 			velocity.x = -_wall_dir * (dash_speed if dash_held else wall_jump_push)
 			_wall_lock = wall_jump_lock
 			_facing = -_wall_dir
+			_spinning = true
 			_buffer = 0.0
 			Sfx.play(&"jump", 1.1, -4.0)
 	if not jump_held and velocity.y < 0.0 and not on_floor:
@@ -197,6 +202,7 @@ func _physics_process(delta: float) -> void:
 
 	# Tiro e carga.
 	if shoot_pressed:
+		_spinning = false
 		_fire(0)
 	if shoot_held:
 		_charge += delta
@@ -281,7 +287,10 @@ func _update_sprite(on_floor: bool, sliding := false) -> void:
 	if _hurt_timer > 0.0:
 		sprite.play("hurt")
 	elif sliding:
+		_spinning = false
 		sprite.play("wall")
+	elif _spinning and not on_floor:
+		sprite.play("spin")
 	elif _dash_timer > 0.0 and on_floor:
 		sprite.play("dash")
 	elif not on_floor:
@@ -290,7 +299,8 @@ func _update_sprite(on_floor: bool, sliding := false) -> void:
 		sprite.play("run")
 	else:
 		sprite.play("idle")
-	sprite.cannon = _shoot_pose > 0.0
+	# Correndo, o canhão vai apontado para a frente (e logo depois de atirar).
+	sprite.cannon = _shoot_pose > 0.0 or sprite.anim == "run" or sprite.anim == "dash"
 	sprite.charge_level = _charge_level() if Input.is_action_pressed("shoot") and controls_enabled else 0
 	sprite.weapon_color = Game.weapon_color()
 	sprite.visible = _invincible <= 0.0 or fmod(_invincible, 0.1) > 0.05

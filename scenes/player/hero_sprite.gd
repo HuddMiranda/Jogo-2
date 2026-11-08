@@ -28,8 +28,8 @@ func muzzle() -> Vector2:
 
 func _draw() -> void:
 	super()
-	if _texture == null or not _data.has("arm_row"):
-		return
+	if _texture == null or not _data.has("arm_row") or anim == "spin":
+		return  # na cambalhota o braço está encolhido no próprio quadro
 	var size := Vector2(_data["frame"][0], _data["frame"][1])
 	var arm_origin := Vector2(_data["arm_origin"][0], _data["arm_origin"][1])
 	var src := Rect2(Vector2((1 if cannon else 0) * size.x, _data["arm_row"] * size.y), size)

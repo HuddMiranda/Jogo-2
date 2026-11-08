@@ -20,7 +20,7 @@ Abra a pasta no **Godot 4.7** (Importar → `project.godot`) e aperte **F5**.
 | Pausa (escolher arma, sair da fase) | Esc ou P | Start |
 | Tela cheia | F11 | |
 
-Pular durante o dash = **dash-pulo** (velocidade alta no ar). Caindo encostada numa parede, segure em direção a ela para **deslizar**; pule para **saltar da parede** (com o dash segurado, o salto sai rápido).
+Correndo, o canhão vai apontado para a frente. **Pular correndo** vira **cambalhota** (o corpo encolhe e gira no ar; atirar desfaz a cambalhota). Pular durante o dash = **dash-pulo** (velocidade alta no ar). Caindo encostada numa parede, segure em direção a ela para **deslizar**; pule para **saltar da parede** (com o dash segurado, o salto sai rápido).
 
 ## O que já existe
 

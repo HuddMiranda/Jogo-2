@@ -143,11 +143,22 @@ def pose(anim, t):
     if anim == 'idle':
         p['bob'] = 1 if t >= 0.5 else 0
     elif anim == 'run':
-        p.update(bob=1 if abs(s) > 0.7 else 0, lean=1, th_f=0.75 * s, th_b=-0.75 * s,
-                 kn_f=max(0.0, -s) * 1.4 + 0.15, kn_b=max(0.0, s) * 1.4 + 0.15,
-                 arm_b=0.7 * s, el_b=-0.9)
-        p['foot_f'] = 'toe' if s < -0.4 else 'flat'
-        p['foot_b'] = 'toe' if s > 0.4 else 'flat'
+        # Corrida de exploradora: passada longa, joelho da frente subindo alto,
+        # perna de trás esticada empurrando com a ponta do pé, tronco inclinado
+        # e um quique a cada passo (mais alto quando as pernas se cruzam).
+        ph = t * math.tau
+        def leg(phase):
+            sn, cs = math.sin(phase), math.cos(phase)
+            thigh = 0.2 + 1.0 * sn
+            knee = 0.15 + 1.5 * max(0.0, math.cos(phase + 0.7))
+            return thigh, knee, ('toe' if thigh < -0.35 else 'flat')
+        th_f, kn_f, foot_f = leg(ph)
+        th_b, kn_b, foot_b = leg(ph + math.pi)
+        p.update(bob=round(2 * abs(math.cos(ph))), lean=2, th_f=th_f, kn_f=kn_f, th_b=th_b, kn_b=kn_b,
+                 foot_f=foot_f, foot_b=foot_b, arm_b=-0.6 * math.sin(ph), el_b=-1.0)
+    elif anim == 'spin':
+        # Encolhida para a cambalhota (o quadro é girado depois).
+        p.update(bob=-2, th_f=2.1, kn_f=2.7, th_b=1.8, kn_b=2.5, foot_b='toe', foot_f='toe', arm_b=1.2, el_b=1.2)
     elif anim == 'jump':
         p.update(bob=-2, th_f=1.1, kn_f=1.6, th_b=0.2, kn_b=1.3, foot_b='toe', arm_b=-0.8, el_b=-0.6)
     elif anim == 'fall':

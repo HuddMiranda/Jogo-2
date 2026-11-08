@@ -279,8 +279,8 @@ def item(cv, kind, t):
 
 SHEETS = {
     'hero': dict(frame=(64, 64), origin=(32, 60), draw=hero,
-                 anims=dict(idle=(4, 5), run=(10, 16), jump=(2, 8), fall=(2, 8), dash=(2, 10), wall=(1, 1),
-                            hurt=(1, 1))),
+                 anims=dict(idle=(4, 5), run=(10, 18), jump=(2, 8), fall=(2, 8), dash=(2, 10), wall=(1, 1),
+                            hurt=(1, 1), spin=(8, 24))),
     'crawler': dict(frame=(48, 32), origin=(20, 30), draw=crawler, anims=dict(walk=(4, 8), shoot=(1, 1))),
     'flyer': dict(frame=(48, 40), origin=(24, 22), draw=flyer, anims=dict(fly=(3, 18))),
     'turret': dict(frame=(32, 32), origin=(16, 30), draw=turret, anims=dict(closed=(1, 1), opening=(1, 1), open=(1, 1))),
@@ -304,9 +304,15 @@ def render_hero(spec):
         meta['anims'][anim] = dict(row=row, frames=frames, fps=fps)
         shoulders = []
         for k in range(frames):
-            frame, shoulder = suit.draw(anim, k / frames, fw, fh, origin)
+            if anim == 'spin':
+                # Cambalhota: a pose encolhida girada de 45 em 45 graus.
+                frame, shoulder = suit.draw('spin', 0.0, fw, fh, origin)
+                img = frame.image().rotate(-45 * k, resample=Image.NEAREST, center=(origin[0], origin[1] - 22))
+            else:
+                frame, shoulder = suit.draw(anim, k / frames, fw, fh, origin)
+                img = frame.image()
             shoulders.append([shoulder[0] - origin[0], shoulder[1] - origin[1]])
-            sheet.paste(frame.image(), (k * fw, row * fh))
+            sheet.paste(img, (k * fw, row * fh))
         meta['shoulders'][anim] = shoulders
     row = len(anims)
     meta['arm_row'] = row

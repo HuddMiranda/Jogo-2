@@ -1,6 +1,6 @@
 class_name Player
 extends CharacterBody2D
-## Elyra, a sentinela élfica de armadura rúnica. A origem do nó fica nos pés.
+## Elyra, a sentinela élfica e espadachim. A origem do nó fica nos pés.
 ##
 ## Movimento (frenético, no estilo dos run-and-gun de 16/32 bits):
 ##   - corrida, pulo de altura variável (soltar o botão corta a subida);
@@ -9,13 +9,20 @@ extends CharacterBody2D
 ##   - deslizar na parede segurando contra ela; pular dela (com dash
 ##     segurado, o pulo sai rápido);
 ##   - com as Pernas Saltadoras: um dash no ar por pulo.
-## Tiro: aperte para um disparo curto (até 3 na tela); segure para carregar
-## (2 níveis; com os Braços Condutores a carga máxima fica mais forte e as
-## poderes dos Guardiões também carregam). Q / E trocam de arma.
+## Espada: aperte para golpear (golpes seguidos alternam de cima para baixo e
+## de baixo para cima); segure para carregar: nível 1 = golpe forte, nível 2 =
+## golpe forte que solta uma onda de lâmina. Com as Braçadeiras Rúnicas a
+## carga máxima fica mais forte e os poderes dos Guardiões também carregam.
+## Os poderes dos Guardiões saem da mão como projéteis. Q / E trocam de arma.
 
 signal died
 
 const SHOT_SCENE := preload("res://scenes/player/shot.tscn")
+## Dano dos golpes de espada por nível de carga.
+const SLASH_DAMAGE := [2, 3, 4]
+## Intervalo mínimo entre golpes e janela para o próximo golpe alternar.
+const SLASH_COOLDOWN := 0.2
+const COMBO_WINDOW := 0.45
 
 @export var run_speed := 150.0
 @export var dash_speed := 330.0
@@ -48,6 +55,9 @@ var _buffer := 0.0
 var _charge := 0.0
 var _charge_sound := 0
 var _shoot_pose := 0.0
+var _slash_cooldown := 0.0
+var _combo_timer := 0.0
+var _combo := 0
 var _hurt_timer := 0.0
 var _invincible := 0.0
 var _ghost_timer := 0.0
@@ -108,6 +118,8 @@ func _physics_process(delta: float) -> void:
 	_invincible -= delta
 	_wall_lock -= delta
 	_shoot_pose -= delta
+	_slash_cooldown -= delta
+	_combo_timer -= delta
 	var on_floor := is_on_floor()
 
 	# Pouso e "coyote time".
@@ -247,9 +259,9 @@ func _switch_weapon(step: int) -> void:
 
 func _fire(level: int) -> void:
 	var weapon := Game.current_weapon
-	if weapon == Game.BUSTER and level == 0:
-		if get_tree().get_nodes_in_group("small_shots").size() >= 3:
-			return
+	if weapon == Game.BUSTER:
+		_slash(level)
+		return
 	else:
 		var cost: int = Game.WEAPONS[weapon]["cost"] * (2 if level > 0 else 1)
 		if not Game.spend_energy(cost):
@@ -264,8 +276,39 @@ func _fire(level: int) -> void:
 	var muzzle := sprite.muzzle()
 	shot.global_position = global_position + Vector2(muzzle.x * _facing, muzzle.y)
 	_shoot_pose = 0.3
-	sprite.cannon = true
-	Sfx.play([&"shot", &"shot_mid", &"shot_full"][level], 1.0 if weapon == Game.BUSTER else 0.8)
+	if sprite.has_method("attack"):
+		sprite.attack(1)
+	Sfx.play([&"shot", &"shot_mid", &"shot_full"][level], 0.8)
+
+
+## Golpe de espada (nível de carga 0, 1 ou 2).
+func _slash(level: int) -> void:
+	if level == 0 and _slash_cooldown > 0.0:
+		return
+	var kind := 2
+	if level == 0:
+		_combo = (_combo + 1) % 2 if _combo_timer > 0.0 else 0
+		kind = _combo
+	_combo_timer = COMBO_WINDOW
+	_slash_cooldown = SLASH_COOLDOWN
+	var slash := Slash.new()
+	slash.kind = kind
+	slash.direction = _facing
+	slash.damage = SLASH_DAMAGE[level] + (1 if level == 2 and Game.has_armor(&"arms") else 0)
+	slash.color = Game.weapon_color(Game.BUSTER)
+	add_child(slash)
+	if sprite.has_method("attack"):
+		sprite.attack(kind)
+	if level == 2:
+		# Onda de lâmina: sai voando na frente e atravessa quem derruba.
+		var wave := SHOT_SCENE.instantiate() as Shot
+		wave.weapon = Game.BUSTER
+		wave.level = 2
+		wave.direction = _facing
+		wave.super_charge = Game.has_armor(&"arms")
+		get_parent().add_child(wave)
+		wave.global_position = global_position + Vector2(_facing * 22.0, -30.0)
+	Sfx.play(&"slash", [1.0, 0.85, 0.7][level])
 
 
 func _spawn_ghost() -> void:
@@ -307,7 +350,6 @@ func _update_sprite(on_floor: bool, sliding := false) -> void:
 	else:
 		sprite.play("idle")
 	# Correndo, o canhão vai apontado para a frente (e logo depois de atirar).
-	sprite.cannon = _shoot_pose > 0.0 or sprite.anim == "run" or sprite.anim == "dash"
 	sprite.charge_level = _charge_level() if Input.is_action_pressed("shoot") and controls_enabled else 0
 	sprite.weapon_color = Game.weapon_color()
 	sprite.visible = _invincible <= 0.0 or fmod(_invincible, 0.1) > 0.05

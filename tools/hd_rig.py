@@ -28,16 +28,16 @@ HIP_F = (5.0, 0.0)
 THIGH = 34.0
 SHIN = 34.0
 UPPER_ARM = 24.0
-MUZZLE = (0.0, 41.0)
+HAND = 24.0
 
 
 def pose(anim, t):
     """Pose alvo no instante t (segundos) da animação."""
     p = dict(lean=0.05, bob=0.0, thf=0.28, knf=0.05, thb=-0.2, knb=0.05, ftf=0.0, ftb=0.0,
-             armb=0.08, elb=0.2, armf=0.1, cf=0.05, spin=0.0)
+             armb=0.08, elb=0.2, armf=0.35, cf=0.9, sw=1.7, spin=0.0)
     if anim == 'idle':
         breath = math.sin(t * 2.2)
-        p.update(bob=-1.2 + breath * 1.2, armb=0.08 + breath * 0.03, armf=0.1 + breath * 0.03)
+        p.update(bob=-1.2 + breath * 1.2, armb=0.08 + breath * 0.03, armf=0.35 + breath * 0.03)
     elif anim == 'run':
         ph = t * 9.5
         def leg(phase):
@@ -48,29 +48,49 @@ def pose(anim, t):
         thf, knf, ftf = leg(ph)
         thb, knb, ftb = leg(ph + math.pi)
         p.update(lean=0.16, bob=-5.0 * abs(math.cos(ph)), thf=thf, knf=knf, ftf=ftf, thb=thb, knb=knb, ftb=ftb,
-                 armb=-0.55 * math.sin(ph), elb=0.9)
+                 armb=-0.55 * math.sin(ph), elb=0.9, armf=0.1 + 0.5 * math.sin(ph), cf=0.5, sw=-1.35)
     elif anim == 'jump':
-        p.update(lean=0.08, thf=1.15, knf=1.7, thb=0.25, knb=1.35, ftb=0.6, armb=-0.6, elb=0.6)
+        p.update(lean=0.08, thf=1.15, knf=1.7, thb=0.25, knb=1.35, ftb=0.6, armb=-0.6, elb=0.6, armf=-0.4, cf=0.6,
+                 sw=-1.2)
     elif anim == 'fall':
         sway = math.sin(t * 6.0)
-        p.update(lean=0.0, thf=0.45, knf=0.55, thb=-0.25, knb=0.35, ftb=0.45, armb=-1.2 + sway * 0.1, elb=0.4)
+        p.update(lean=0.0, thf=0.45, knf=0.55, thb=-0.25, knb=0.35, ftb=0.45, armb=-1.2 + sway * 0.1, elb=0.4,
+                 armf=0.6, cf=0.4, sw=1.9)
     elif anim == 'spin':
         p.update(lean=0.45, thf=2.0, knf=2.55, thb=1.75, knb=2.45, ftf=0.5, ftb=0.6, armb=0.9, elb=1.6, armf=0.6,
-                 cf=0.9, spin=t * 15.0)
+                 cf=1.2, sw=-1.4, spin=t * 15.0)
     elif anim == 'dash':
-        p.update(lean=0.42, bob=8.0, thf=1.05, knf=1.35, thb=-0.95, knb=0.2, ftb=0.6, armb=-0.5, elb=0.5)
+        p.update(lean=0.42, bob=8.0, thf=1.05, knf=1.35, thb=-0.95, knb=0.2, ftb=0.6, armb=-0.5, elb=0.5, armf=-0.7,
+                 cf=0.3, sw=-1.3)
     elif anim == 'wall':
-        p.update(lean=-0.12, thf=0.85, knf=1.5, thb=0.15, knb=1.0, ftb=0.4, armb=-2.2, elb=-0.4)
+        p.update(lean=-0.12, thf=0.85, knf=1.5, thb=0.15, knb=1.0, ftb=0.4, armb=-2.2, elb=-0.4, armf=0.5, cf=0.8,
+                 sw=1.6)
     elif anim == 'hurt':
-        p.update(lean=-0.38, bob=-2.0, thf=0.5, knf=0.6, thb=-0.5, knb=0.35, armb=-2.0, elb=0.5, armf=-0.4)
+        p.update(lean=-0.38, bob=-2.0, thf=0.5, knf=0.6, thb=-0.5, knb=0.35, armb=-2.0, elb=0.5, armf=-0.4, cf=0.3,
+                 sw=0.6)
     return p
 
 
-def aim_pose(p, shooting):
-    """Braço-canhão: apontado para a frente (atirando/correndo) ou solto."""
-    if shooting:
-        p = dict(p, armf=0.72 + p['lean'], cf=0.85)
-    return p
+# Golpes de espada: braço da frente de [início] até [fim] (armf, cf, sw).
+ATTACK_TIME = 0.26
+SWINGS = {
+    0: ((2.7, 0.2, 0.4), (0.25, 0.1, 1.0)),   # de cima para baixo
+    1: ((-0.2, 0.3, 1.2), (2.4, 0.4, 0.6)),   # de baixo para cima
+    2: ((2.9, 0.1, 0.3), (0.15, 0.05, 1.1)),  # golpe carregado
+}
+
+
+def attack_pose(p, kind, t):
+    """Sobrepõe o golpe de espada (t = segundos desde o início)."""
+    start, end = SWINGS[kind]
+    if t < 0.04:
+        arm = start
+    else:
+        u = min(1.0, (t - 0.04) / 0.08)
+        u = 1.0 - (1.0 - u) ** 3
+        arm = tuple(a + (b - a) * u for a, b in zip(start, end))
+    lean = p['lean'] + (0.12 if kind != 1 else -0.05)
+    return dict(p, armf=arm[0], cf=arm[1], sw=arm[2], lean=lean)
 
 
 # --- Cinemática (transformações 2D simples) -----------------------------------------
@@ -112,18 +132,20 @@ def skeleton(p, grounded):
     up_b = mul(torso, mat(-p['armb'], SHOULDER_B))
     fore_b = mul(up_b, mat(-p['elb'], (0, UPPER_ARM)))
     up_f = mul(torso, mat(-p['armf'], SHOULDER_F))
-    cannon = mul(up_f, mat(-p['cf'], (0, UPPER_ARM)))
-    parts = [('upper_arm', up_b, True), ('forearm', fore_b, True), ('pauldron', mul(torso, mat(0, SHOULDER_B)), True),
+    fore_f = mul(up_f, mat(-p['cf'], (0, UPPER_ARM)))
+    sword = mul(fore_f, mat(-p['sw'], (0, HAND)))
+    parts = [('upper_arm', up_b, True), ('forearm', fore_b, True), ('shoulder', mul(torso, mat(0, SHOULDER_B)), True),
              ('thigh', tb, True), ('shin', sb, True), ('foot', fb, True),
              ('torso', torso, False),
-             ('thigh', tf, False), ('shin', sf, False), ('foot', ff, False),
-             ('helmet', mul(torso, mat(0, NECK)), False),
-             ('upper_arm', up_f, False), ('cannon', cannon, False), ('pauldron', mul(torso, mat(0, SHOULDER_F)), False)]
+             ('thigh', tf, False), ('shin', sf, False), ('foot', ff, False), ('skirt', torso, False),
+             ('head', mul(torso, mat(0, NECK)), False),
+             ('upper_arm', up_f, False), ('sword', sword, False), ('forearm', fore_f, False),
+             ('shoulder', mul(torso, mat(0, SHOULDER_F)), False)]
     shift = 0.0
     if grounded:
         sole = max(apply(m, pt)[1] for m in (fb, ff) for pt in ((-10, 24), (28, 24)))
         shift = -sole
-    return parts, shift, cannon
+    return parts, shift, sword
 
 
 def load_pivots():
@@ -135,11 +157,15 @@ def load_pivots():
                 PIVOTS[name] = (float(nums[0]), float(nums[1]))
 
 
-def render(anim, t, shooting=False, grounded=None, size=(300, 440), origin=(120, 420)):
+def render(anim, t, attack=None, grounded=None, size=(300, 440), origin=(120, 420)):
+    """attack = (tipo do golpe, segundos desde o início) ou None."""
     load_pivots()
     if grounded is None:
         grounded = anim in ('idle', 'run', 'dash', 'hurt')
-    return render_pose(aim_pose(pose(anim, t), shooting), grounded, size, origin)
+    p = pose(anim, t)
+    if attack:
+        p = attack_pose(p, attack[0], attack[1])
+    return render_pose(p, grounded, size, origin)
 
 
 def render_pose(p, grounded, size=(300, 440), origin=(120, 420)):
@@ -170,10 +196,10 @@ def render_pose(p, grounded, size=(300, 440), origin=(120, 420)):
 if __name__ == '__main__':
     anim = sys.argv[1] if len(sys.argv) > 1 else 'run'
     path = sys.argv[2] if len(sys.argv) > 2 else 'preview.gif'
-    shooting = anim in ('run', 'dash') or (len(sys.argv) > 3 and sys.argv[3] == 'shoot')
+    slash = len(sys.argv) > 3 and sys.argv[3] == 'slash'
     frames = []
     for i in range(36):
-        f = render(anim, i / 30.0, shooting)
+        f = render(anim, i / 30.0, (i % 2, (i % 12) / 30.0) if slash else None)
         bg = Image.new('RGBA', f.size, (24, 26, 36, 255))
         bg.alpha_composite(f)
         frames.append(bg.convert('P', palette=Image.ADAPTIVE))

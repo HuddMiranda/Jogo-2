@@ -2,7 +2,7 @@ extends CanvasLayer
 ## Interface da fase: barra de vida vertical (com a energia da arma ao lado,
 ## na cor dela), barra do chefe à direita, nome da arma ao trocar, avisos no
 ## centro (título da fase, chegada do chefe, itens), a tela de "arma
-## absorvida" e o menu de pausa (escolher arma, ver a armadura, sair).
+## absorvida" e o menu de pausa (escolher arma, ver as relíquias, sair).
 
 signal weapon_get_closed
 

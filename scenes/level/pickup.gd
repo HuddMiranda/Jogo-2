@@ -1,12 +1,12 @@
 class_name Pickup
 extends Area2D
 ## Item: vida (pequena/grande), energia de arma (pequena/grande), Semente
-## da Vida (vida máxima +2) ou relicário com uma peça de armadura.
+## da Vida (vida máxima +2) ou relicário com uma relíquia élfica.
 ## Itens soltos por inimigos (temporary) caem até o chão e somem depois de
 ## um tempo; corações e casulos ficam no lugar e só existem uma vez.
 
 @export_enum("health_small", "health_big", "energy_small", "energy_big", "heart", "capsule") var kind := "health_small"
-## Peça de armadura do casulo (Game.ARMOR).
+## Relíquia do relicário (Game.ARMOR).
 @export var armor_part: StringName = &""
 ## Identificador para lembrar que já foi pego (corações e casulos).
 @export var item_id := ""
@@ -78,7 +78,7 @@ func _on_body_entered(body: Node) -> void:
 			Game.add_armor(armor_part)
 			Sfx.play(&"weapon_get")
 			var info: Dictionary = Game.ARMOR.get(armor_part, {})
-			_announce(info.get("name", "Armadura").to_upper(), info.get("hint", ""))
+			_announce(info.get("name", "Relíquia").to_upper(), info.get("hint", ""))
 			Game.save_game()
 	queue_free()
 

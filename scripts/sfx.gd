@@ -9,6 +9,7 @@ const VOICES := 12
 
 ## nome: [tom inicial, tom final, duração (s), onda, volume, ruído (0 a 1)]
 const SOUNDS := {
+	&"slash": [1600.0, 300.0, 0.1, "saw", 0.3, 0.85],
 	&"shot": [880.0, 520.0, 0.07, "square", 0.35, 0.0],
 	&"shot_mid": [520.0, 240.0, 0.14, "square", 0.45, 0.1],
 	&"shot_full": [300.0, 80.0, 0.3, "saw", 0.55, 0.25],

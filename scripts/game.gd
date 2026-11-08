@@ -1,12 +1,12 @@
 extends Node
 ## Estado global do jogo (autoload "Game"): os oito Guardiões (chefes), suas
-## fases e armas, as fraquezas, as peças da armadura rúnica, as Sementes da
+## fases e armas, as fraquezas, as relíquias élficas, as Sementes da
 ## Vida, o que já foi coletado e o salvamento.
 ##
 ## Premissa: no reino élfico de Sylvaria, a Praga Cinzenta corrompeu os oito
 ## Guardiões, espíritos-fera que protegiam a Árvore-Mãe e as florestas. Elyra,
-## sentinela élfica de armadura rúnica e manopla arcana, enfrenta os oito; de
-## cada um purificado, a armadura absorve o poder. Cada Guardião é fraco
+## sentinela élfica e espadachim, enfrenta os oito; de cada um purificado,
+## ela herda o poder. Cada Guardião é fraco
 ## contra o poder de outro.
 
 signal health_changed(current: int, maximum: int)
@@ -48,9 +48,9 @@ const BOSSES := [
 		"weak": &"plasma_sting", "color": Color(0.9, 0.6, 1.0), "level": ""},
 ]
 
-## Armas: a manopla (infinita) e os poderes dos Guardiões (gastam energia).
+## Armas: a espada (infinita) e os poderes dos Guardiões (gastam energia).
 const WEAPONS := {
-	&"buster": {"name": "Manopla Arcana", "color": Color(0.55, 1.0, 0.7), "cost": 0},
+	&"buster": {"name": "Espada Élfica", "color": Color(0.75, 1.0, 0.85), "cost": 0},
 	&"plasma_sting": {"name": "Ferrão de Âmbar", "color": Color(1.0, 0.7, 0.2), "cost": 1},
 	&"seismic_hammer": {"name": "Martelo Rúnico", "color": Color(0.75, 0.55, 0.35), "cost": 2},
 	&"abyss_jet": {"name": "Maré das Ninfeias", "color": Color(0.35, 0.45, 1.0), "cost": 1},
@@ -61,12 +61,12 @@ const WEAPONS := {
 	&"prism_dust": {"name": "Pó Lunar", "color": Color(0.95, 0.65, 1.0), "cost": 2},
 }
 
-## Peças da armadura rúnica, guardadas em relicários escondidos nas fases.
+## Relíquias élficas, guardadas em relicários escondidos nas fases.
 const ARMOR := {
 	&"legs": {"name": "Botas do Vento", "hint": "Dash no ar (uma vez por pulo)"},
 	&"arms": {"name": "Braçadeiras Rúnicas", "hint": "Carga máxima mais forte; poderes dos Guardiões também carregam"},
-	&"body": {"name": "Peitoral de Prata-Lunar", "hint": "Metade do dano recebido"},
-	&"head": {"name": "Elmo do Vidente", "hint": "Revela paredes frágeis e itens escondidos"},
+	&"body": {"name": "Amuleto de Prata-Lunar", "hint": "Metade do dano recebido"},
+	&"head": {"name": "Diadema do Vidente", "hint": "Revela paredes frágeis e itens escondidos"},
 }
 
 var defeated: Array[StringName] = []

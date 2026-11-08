@@ -1,8 +1,8 @@
 class_name Shot
 extends Area2D
 ## Disparo da sentinela. O visual e o comportamento dependem da arma:
-##   buster        — nível 0: tiro curto; 1: tiro médio; 2: rajada carregada
-##                   (atravessa os inimigos que derruba);
+##   buster        — espada: só o nível 2 vira projétil, a onda de lâmina
+##                   em meia-lua (atravessa os inimigos que derruba);
 ##   plasma_sting  — Ferrão de Plasma: persegue o inimigo mais próximo;
 ##   outras armas  — por enquanto, um projétil reto na cor da arma.
 ## Inimigos com escudo rebatem o tiro (que sai voando sem causar dano).
@@ -113,9 +113,27 @@ func _draw() -> void:
 			draw_circle(Vector2.ZERO, r + 2.0, Color(color, 0.4))
 			draw_circle(Vector2.ZERO, r * 0.6, Color.WHITE)
 		_:
+			if weapon == Game.BUSTER:
+				# Onda de lâmina: meia-lua vertical, com rastro.
+				var d := signf(velocity.x)
+				for k in 3:
+					_draw_crescent(Vector2(-d * k * 7.0, 0), d, r + 6.0 - k * 2.0, Color(color, 0.5 - k * 0.15))
+				_draw_crescent(Vector2.ZERO, d, r + 6.0, Color(1, 1, 1, 0.75 + 0.25 * flicker))
+				return
 			# Rajada: meia-lua de energia com rastro.
 			var d := signf(velocity.x)
 			for k in 3:
 				draw_circle(Vector2(-d * (6 + k * 6), 0), r * (0.7 - k * 0.18), Color(color, 0.35 - k * 0.1))
 			draw_circle(Vector2.ZERO, r + 2.0 * flicker, Color(color, 0.8))
 			draw_circle(Vector2(d * 3, 0), r * 0.55, Color(1, 1, 1, 0.95))
+
+
+func _draw_crescent(at: Vector2, d: float, r: float, color: Color) -> void:
+	var outer := PackedVector2Array()
+	var inner := PackedVector2Array()
+	for i in 13:
+		var a := lerpf(-1.3, 1.3, i / 12.0)
+		outer.append(at + Vector2(cos(a) * d * r * 0.55, sin(a) * r))
+		inner.append(at + Vector2((cos(a) * 0.55 * r - r * 0.3 * cos(a)) * d - d * 2.0, sin(a) * r * 0.85))
+	inner.reverse()
+	draw_colored_polygon(outer + inner, color)

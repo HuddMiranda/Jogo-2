@@ -6,13 +6,9 @@ Guia para quem vai produzir a arte do jogo (artista, estúdio ou geração por I
 
 - **Estilo:** 2D **pintado à mão em alta resolução**, na linha de *Afterimage*: pinceladas suaves, iluminação dramática com luz de recorte (rim light), atmosfera densa, cenários em várias camadas de profundidade. Não é pixel art.
 - **Mundo:** o reino élfico de **Sylvaria**: florestas antigas de árvores colossais, ruínas élficas de pedra clara com entalhes dourados tomadas por musgo e raízes, colmeias de âmbar, lagos de ninfeias, vaga-lumes e runas que brilham. Uma praga cinzenta corrompe partes do reino.
-- **Tom:** melancólico e misterioso, com pontos de cor fortes nas fontes de luz (energia, gemas, visores).
-- **Protagonista — Elyra:** sentinela élfica em **armadura rúnica** fechada, proporções humanas (cerca de 7 cabeças), **paleta Marfim** (marfim, dourado, traje verde-floresta escuro, visor e gemas esmeralda):
-  - elmo élfico: crista dourada em forma de folha, **aletas longas como orelhas élficas** para trás, **visor amendoado** verde, gema na testa, máscara elegante; **cabelo prateado** comprido saindo pela nuca;
-  - ombreiras grandes e arredondadas com filete dourado; peito com gema esmeralda; cintura fina de traje escuro;
-  - braço direito com a **manopla arcana**: braçadeira com filigrana de folhas e um cristal de esmeralda preso por garras douradas (de onde sai o tiro);
-  - coxa, joelheira, canela, tornozelo e pé como partes bem definidas.
-  - Referência: o desenho em pixel art aprovado está em `art/handmade/vex_idle_ivory.png` (proporções e peças) e o conceito vetorial no canvas de design do projeto.
+- **Tom:** melancólico e misterioso, com pontos de cor fortes nas fontes de luz (magia, gemas, vaga-lumes).
+- **Protagonista — Elyra:** elfa espadachim, **sem armadura**, proporções humanas (cerca de 7 cabeças): pele clara, cabelo loiro-claro comprido, orelhas longas e pontudas, olhos verdes, diadema dourado com gema esmeralda; túnica verde-floresta com filete dourado e cinto de couro, mangas claras, braçadeiras e botas de couro, calça escura; **espada élfica** de lâmina em forma de folha, guarda dourada com gema.
+  - Referência: a versão por peças em `art/hd/vex_parts/` (proporções e paleta) e `art/hd/portrait.png`.
 
 ## Formato técnico (vale para tudo)
 
@@ -51,21 +47,21 @@ hurt=12
 idle_shoot=10
 
 [muzzle]
-; cristal da manopla (onde nasce o tiro), em px do quadro, por animação
+; mão da espada (onde nascem os poderes), em px do quadro, por animação
 default=Vector2(230, 120)
 run_shoot=Vector2(236, 126)
 ```
 
 | Personagem (`<nome>`) | Tamanho em pé no desenho | Animações (quadros sugeridos) |
 |---|---|---|
-| `hero` (Elyra) | ~192 px de altura | `idle` (8–12), `idle_shoot` (4), `run` (12–16), `run_shoot` (12–16, manopla à frente), `jump` (4), `jump_shoot` (2), `fall` (4), `fall_shoot` (2), `spin` (8–12, cambalhota), `dash` (4–6), `dash_shoot` (4), `wall` (4), `hurt` (3) |
+| `hero` (Elyra) | ~192 px de altura | `idle` (8–12), `idle_shoot` (4), `run` (12–16), `run_shoot` (12–16), `jump` (4), `jump_shoot` (2), `fall` (4), `fall_shoot` (2), `spin` (8–12, cambalhota), `dash` (4–6), `dash_shoot` (4), `wall` (4), `hurt` (3) |
 | `crawler` (Rastejante, besouro da floresta que cospe ácido) | ~64 px | `walk` (8), `shoot` (4) |
 | `flyer` (Zumbidor, inseto que mergulha) | ~56 px | `fly` (6) |
 | `turret` (Bulbo, flor carnívora que se abre) | ~64 px | `closed` (1), `opening` (3), `open` (4) |
 | `wasp` (Vespa de Âmbar, chefe) | ~300 px | `idle` (8–12), `dash` (4), `shoot` (6), `hurt` (2) |
 | `items` | ~48 px cada | `health_small`, `health_big`, `energy_small`, `energy_big`, `heart`, `capsule` (4–6 cada) |
 
-Animações `_shoot` são as mesmas poses com a manopla apontado para a frente; se não existirem, o jogo usa a animação normal.
+Para a espada: `slash_down` e `slash_up` (4–6 cada, golpes alternados), `slash_charged` (6) e as mesmas no ar. Hoje o jogo anima a Elyra por peças (`tools/hd_parts.py`); quadros desenhados por um artista podem substituir isso depois.
 
 ### Blocos do mapa
 

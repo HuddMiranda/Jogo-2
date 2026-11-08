@@ -6,7 +6,7 @@ extends Node2D
 ##   C  checkpoint (renasce aqui) G  fim da fase (fases sem chefe)
 ##   c  Rastejante   f  Zumbidor   t  Bulbo
 ##   h  vida pequena H  vida grande e  energia pequena E energia grande
-##   L  Semente da Vida             A  relicário de armadura (peça em ARMOR)
+##   L  Semente da Vida             A  relicário (relíquia em ARMOR)
 ##   D  porta do chefe (coluna)    B  onde o chefe aparece
 ## Cair abaixo do mapa também mata. A câmera fica presa dentro do mapa e, na
 ## arena do chefe, presa à arena.
